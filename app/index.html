@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hets</title>
+  <style>
+    .links line {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+
+    .links .unproven {
+      stroke: red;
+    }
+
+    .nodes circle {
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+
+    .nodes .internal {
+      fill: #ff9001;
+    }
+
+    .nodes text {
+      fill-opacity: 0.6;
+      font-size: x-small;
+    }
+
+    /* svg {
+      background-color: mintcream;
+    } */
+
+    .link {
+      fill: none;
+      stroke: #555;
+      stroke-opacity: 0.4;
+      stroke-width: 1.5px;
+    }
+
+    #content {
+      padding: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Dependencies -->
+  <script src="../node_modules/react/umd/react.development.js"></script>
+  <script src="../node_modules/react-dom/umd/react-dom.development.js"></script>
+  <script src="../node_modules/d3/build/d3.js"></script>
+
+  <div id="content"></div>
+
+  <!-- Main -->
+  <script src="./dist/bundle.js"></script>
+</body>
+
+</html>
