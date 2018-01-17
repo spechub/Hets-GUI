@@ -80,7 +80,7 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
   dialog.showOpenDialog(
     {
       filters: [
-        { name: "Hets", extensions: ["casl", "het", "hpf", "thy"] },
+        { name: "Hets", extensions: ["dol", "casl", "het", "hpf", "thy"] },
         { name: "All Files", extensions: ["*"] }
       ],
       properties: ["openFile"]
