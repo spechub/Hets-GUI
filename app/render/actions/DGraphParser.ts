@@ -93,19 +93,25 @@ class DGraphImpl implements DGraph, Serializable<DGraph> {
     this.nextlinkid = input["nextlinkid"];
 
     this.DGLinks = [];
-    input["DGLink"].forEach((dglink: any) => {
-      this.DGLinks.push(new DGLinkImpl().deserialize(dglink));
-    });
+    if (input["DGLink"]) {
+      input["DGLink"].forEach((dglink: any) => {
+        this.DGLinks.push(new DGLinkImpl().deserialize(dglink));
+      });
+    }
 
     this.DGNodes = [];
-    input["DGNode"].forEach((dgnode: any) => {
-      this.DGNodes.push(new DGNodeImpl().deserialize(dgnode));
-    });
+    if (input["DGNode"]) {
+      input["DGNode"].forEach((dgnode: any) => {
+        this.DGNodes.push(new DGNodeImpl().deserialize(dgnode));
+      });
+    }
 
     this.Globals = [];
-    input["Global"].forEach((global: any) => {
-      this.Globals.push(new GlobalImpl().deserialize(global));
-    });
+    if (input["Global"]) {
+      input["Global"].forEach((global: any) => {
+        this.Globals.push(new GlobalImpl().deserialize(global));
+      });
+    }
 
     return this;
   }
