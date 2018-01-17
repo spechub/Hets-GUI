@@ -160,8 +160,23 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
         id: link.linkid,
         source: link.id_source,
         target: link.id_target,
-        unproven: link.Type.includes("Unproven")
+        unproven: link.Type.includes("Unproven"),
+        internal: !link.Type.includes("GlobalDef"),
+        loops: false
       });
+    }
+
+    for (const link of links) {
+      for (const other of links) {
+        if (
+          link === other ||
+          other.source !== link.target ||
+          other.target !== link.source
+        ) {
+          continue;
+        }
+        other.loops = true;
+      }
     }
 
     this.updateGraphRender(links, nodes);
@@ -184,10 +199,10 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     this.link = this.base
       .append("g")
       .attr("class", "links")
-      .selectAll("line")
+      .selectAll(".line")
       .data(links)
       .enter()
-      .append("line")
+      .append("path")
       .attr("stroke-width", 1)
       .attr("class", (l: any) => {
         return l.unproven ? "unproven" : "";
@@ -238,23 +253,30 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
   }
 
   private ticked() {
-    this.link
-      .attr("x1", (d: any) => {
-        return d.source.x;
-      })
-      .attr("y1", (d: any) => {
-        return d.source.y;
-      })
-      .attr("x2", (d: any) => {
-        return d.target.x;
-      })
-      .attr("y2", (d: any) => {
-        return d.target.y;
-      });
+    this.link.attr("d", this.positionLink.bind(this));
 
     this.node.attr("transform", (n: any) => {
       return `translate(${n.x} ${n.y})`;
     });
+  }
+
+  private positionLink(l: any) {
+    if (l.loops) {
+      return `M ${l.source.x} ${l.source.y} Q ${this.offsetLoop(l).x} ${
+        this.offsetLoop(l).y
+      }, ${l.target.x} ${l.target.y}`;
+    } else {
+      return `M ${l.source.x} ${l.source.y} L ${l.target.x} ${l.target.y}`;
+    }
+  }
+
+  private offsetLoop(d: any): { x: number; y: number } {
+    const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
+    const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    return {
+      x: d.source.x + -vec.y / len * 20 + vec.x * 0.5,
+      y: d.source.y + vec.x / len * 20 + vec.y * 0.5
+    };
   }
 
   private dragstarted(d: any) {
