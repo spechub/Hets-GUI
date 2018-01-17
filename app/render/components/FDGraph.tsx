@@ -207,6 +207,9 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     });
 
     this.node
+      .filter((n: any) => {
+        return !n.internal;
+      })
       .append("text")
       .append("tspan")
       .attr("x", 7)
