@@ -87,7 +87,7 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
     },
     (paths: string[]) => {
       if (paths != undefined) {
-        const path = "/home/ysengrimm/Desktop/Hets-lib/Basic/Graphs.casl"; //paths[0];
+        const path = paths[0];
         console.log('==> Open File: "' + path + '"');
         Utils.queryHETSApi(message.hostname, message.port, path)
           .catch((err: Error) => {
