@@ -87,8 +87,9 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
     },
     (paths: string[]) => {
       if (paths != undefined) {
-        console.log(paths[0]);
-        Utils.queryHETSApi(message.hostname, message.port, paths[0])
+        const path = "/home/ysengrimm/Desktop/Hets-lib/Basic/Graphs.casl"; //paths[0];
+        console.log('==> Open File: "' + path + '"');
+        Utils.queryHETSApi(message.hostname, message.port, path)
           .catch((err: Error) => {
             console.error(err.message);
             dialog.showErrorBox("Network Error", err.message);

@@ -30,6 +30,9 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
   internalEdges: boolean;
   internalNodes: boolean;
 
+  zoom: d3.ZoomBehavior<any, any>;
+  currentZoomTransform: any;
+
   constructor(props: any) {
     super(props);
 
@@ -86,12 +89,15 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
       .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter(width / 2, height / 2));
 
-    this.svg.call(
-      d3
-        .zoom()
-        .scaleExtent([1 / 2, 8])
-        .on("zoom", this.zoomed.bind(this))
-    );
+    this.zoom = d3
+      .zoom()
+      .scaleExtent([1 / 2, 8])
+      .on("zoom", () => {
+        this.currentZoomTransform = d3.event.transform;
+        this.base.attr("transform", this.currentZoomTransform);
+      });
+
+    this.svg.call(this.zoom);
   }
 
   private inputted(_e: Event, d: any) {
@@ -113,19 +119,25 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     }
   }
 
-  private zoomed() {
-    this.base.attr("transform", d3.event.transform);
-  }
-
   private displayResp(_e: Event, s: any) {
+    console.groupCollapsed("==> Got response from main thread");
+    console.log(s);
+    console.groupEnd();
+    if (!s) {
+      alert("Could not open file!");
+      return;
+    }
     this.graph = new DGraphParser(s);
+    console.groupCollapsed("==> Parsed DGraph");
+    console.log(this.graph);
+    console.groupEnd();
     this.prepareData(this.graph);
   }
 
   private prepareData(graph: DGraphParser) {
     this.base.remove();
     this.base = this.svg.append("g");
-    console.log(graph);
+    this.base.attr("transform", this.currentZoomTransform);
 
     const links = [];
     const nodes = [];
@@ -188,7 +200,20 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
       .append("marker")
       .attr("id", "arrow")
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 22)
+      .attr("refX", 5)
+      .attr("refY", 0)
+      .attr("markerWidth", 5)
+      .attr("markerHeight", 5)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("d", "M0,-5L10,0L0,5");
+
+    this.base
+      .append("defs")
+      .append("marker")
+      .attr("id", "arrow-up")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 5)
       .attr("refY", 0)
       .attr("markerWidth", 5)
       .attr("markerHeight", 5)
@@ -207,7 +232,9 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
       .attr("class", (l: any) => {
         return l.unproven ? "unproven" : "";
       })
-      .attr("marker-end", "url(#arrow)");
+      .attr("marker-end", (l: any) => {
+        return l.unproven ? "url(#arrow-up)" : "url(#arrow)";
+      });
 
     this.node = this.base
       .append("g")
@@ -264,10 +291,21 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     if (l.loops) {
       return `M ${l.source.x} ${l.source.y} Q ${this.offsetLoop(l).x} ${
         this.offsetLoop(l).y
-      }, ${l.target.x} ${l.target.y}`;
+      }, ${this.shortenEndLoop(l).x} ${this.shortenEndLoop(l).y}`;
     } else {
-      return `M ${l.source.x} ${l.source.y} L ${l.target.x} ${l.target.y}`;
+      return `M ${l.source.x} ${l.source.y} L ${this.shortenEnd(l).x} ${
+        this.shortenEnd(l).y
+      }`;
     }
+  }
+
+  private shortenEnd(d: any) {
+    const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
+    const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    return {
+      x: d.target.x - vec.x / len * 8,
+      y: d.target.y - vec.y / len * 8
+    };
   }
 
   private offsetLoop(d: any): { x: number; y: number } {
@@ -276,6 +314,15 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     return {
       x: d.source.x + -vec.y / len * 20 + vec.x * 0.5,
       y: d.source.y + vec.x / len * 20 + vec.y * 0.5
+    };
+  }
+
+  private shortenEndLoop(d: any) {
+    const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
+    const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    return {
+      x: d.target.x + -vec.y / len * 7 - vec.x * 0.1,
+      y: d.target.y + vec.x / len * 7 - vec.y * 0.1
     };
   }
 

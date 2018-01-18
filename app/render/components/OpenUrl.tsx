@@ -41,7 +41,6 @@ export class OpenUrl extends React.Component<OpenUrlProps, OpenUrlState> {
   }
 
   private onClick() {
-    console.log(this.state.filePath);
     IPCComm.queryHets(this.state.filePath);
   }
 }
