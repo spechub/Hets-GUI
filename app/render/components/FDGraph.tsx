@@ -157,7 +157,7 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     }
 
     for (const link of graph.dgraph.DGLinks) {
-      if (!this.internalEdges && !link.Type.includes("GlobalDef")) {
+      if (!this.internalEdges && !link.Type.includes("Def")) {
         continue;
       }
 
@@ -173,7 +173,7 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
         source: link.id_source,
         target: link.id_target,
         unproven: link.Type.includes("Unproven"),
-        internal: !link.Type.includes("GlobalDef"),
+        internal: !link.Type.includes("Def"),
         loops: false
       });
     }
