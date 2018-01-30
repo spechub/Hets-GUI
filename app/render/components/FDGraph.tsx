@@ -6,7 +6,6 @@ import { IPCComm } from "../actions/IPCComm";
 import { DGraphParser } from "../actions/DGraphParser";
 import { QUERY_CHANNEL_RESPONSE } from "../../shared/SharedConstants";
 import { GraphControls } from "./GraphControls";
-import { DGLink } from "../../shared/DGraph";
 
 export interface FDGraphProps {
   width: string;
@@ -140,16 +139,9 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     this.base = this.svg.append("g");
     this.base.attr("transform", this.currentZoomTransform);
 
-    const links: {
-      id: number;
-      source: number;
-      target: number;
-      unproven: boolean;
-      internal: boolean;
-      loops: boolean;
-    }[] = [];
-    const nodes: { id: number; name: string; internal: boolean }[] = [];
-    const excludedNodes: number[] = [];
+    const links = [];
+    const nodes = [];
+    const excludedNodes = [];
 
     for (const node of graph.dgraph.DGNodes) {
       if (!this.internalNodes && node.internal) {
@@ -169,35 +161,9 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
         continue;
       }
 
-      let newTarget = null;
       if (
-        !this.internalNodes &&
-        !excludedNodes.includes(link.id_source) &&
-        this.findEdges(
-          link.id_source,
-          link.id_source,
-          excludedNodes,
-          graph.dgraph.DGLinks,
-          []
-        ) !== null
-      ) {
-        newTarget = this.findEdges(
-          link.id_source,
-          link.id_source,
-          excludedNodes,
-          graph.dgraph.DGLinks,
-          []
-        );
-        console.log(graph.dgraph.DGNodes[link.id_source].name);
-        for (const target in newTarget) {
-          console.log("-->" + graph.dgraph.DGNodes[target].name);
-        }
-      }
-
-      if (
-        (newTarget === null || newTarget.length === 0) &&
-        (excludedNodes.includes(link.id_source) ||
-          excludedNodes.includes(link.id_target))
+        excludedNodes.includes(link.id_source) ||
+        excludedNodes.includes(link.id_target)
       ) {
         continue;
       }
@@ -226,34 +192,6 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     }
 
     this.updateGraphRender(links, nodes);
-  }
-
-  private findEdges(
-    startNodeId: number,
-    nodeId: number,
-    excludedNodesIds: number[],
-    links: DGLink[],
-    outLinksIds: number[]
-  ): number[] {
-    if (startNodeId !== nodeId && !excludedNodesIds.includes(nodeId)) {
-      outLinksIds.push(nodeId);
-    }
-
-    for (const link of links) {
-      if (!link.Type.includes("Def")) {
-        continue;
-      }
-      if (link.id_source === nodeId) {
-        return this.findEdges(
-          startNodeId,
-          link.id_target,
-          excludedNodesIds,
-          links,
-          outLinksIds
-        );
-      }
-    }
-    return outLinksIds;
   }
 
   private updateGraphRender(links: any, nodes: any) {
