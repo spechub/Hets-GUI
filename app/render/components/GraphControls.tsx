@@ -27,7 +27,7 @@ export class GraphControls extends React.Component<GraphControlProps, {}> {
         <Menu.Item>
           <Checkbox
             toggle
-            label="Show Internal Edges"
+            label="Show Theorem Links"
             onChange={this.props.showInternalEdges}
           />
         </Menu.Item>
