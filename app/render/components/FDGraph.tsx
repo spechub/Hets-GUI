@@ -17,6 +17,22 @@ interface FDGraphState {
   height: number;
 }
 
+interface InternalNode {
+  id: number;
+  name: string;
+  internal: boolean;
+}
+
+interface InternalLink {
+  id: number;
+  source: number;
+  target: number;
+  unproven: boolean;
+  proven: boolean;
+  internal: boolean;
+  loops: boolean;
+}
+
 export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
   svg: d3.Selection<HTMLElement, any, HTMLElement, any>;
   simulation: d3.Simulation<any, any>;
@@ -139,9 +155,9 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     this.base = this.svg.append("g");
     this.base.attr("transform", this.currentZoomTransform);
 
-    const links = [];
-    const nodes = [];
-    const excludedNodes = [];
+    const links: InternalLink[] = [];
+    const nodes: InternalNode[] = [];
+    const excludedNodes: number[] = [];
 
     for (const node of graph.dgraph.DGNodes) {
       if (!this.internalNodes && node.internal) {
@@ -168,11 +184,13 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
         continue;
       }
 
+      console.log(link.Type);
       links.push({
         id: link.linkid,
         source: link.id_source,
         target: link.id_target,
         unproven: link.Type.includes("Unproven"),
+        proven: link.Type.includes("Proven"),
         internal: !link.Type.includes("Def"),
         loops: false
       });
@@ -194,7 +212,7 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     this.updateGraphRender(links, nodes);
   }
 
-  private updateGraphRender(links: any, nodes: any) {
+  private updateGraphRender(links: InternalLink[], nodes: any) {
     this.base
       .append("defs")
       .append("marker")
@@ -211,7 +229,20 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
     this.base
       .append("defs")
       .append("marker")
-      .attr("id", "arrow-up")
+      .attr("id", "arrow-unproven")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 5)
+      .attr("refY", 0)
+      .attr("markerWidth", 5)
+      .attr("markerHeight", 5)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("d", "M0,-5L10,0L0,5");
+
+    this.base
+      .append("defs")
+      .append("marker")
+      .attr("id", "arrow-proven")
       .attr("viewBox", "0 -5 10 10")
       .attr("refX", 5)
       .attr("refY", 0)
@@ -229,11 +260,23 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
       .enter()
       .append("path")
       .attr("stroke-width", 1)
-      .attr("class", (l: any) => {
-        return l.unproven ? "unproven" : "";
+      .attr("class", (l: InternalLink) => {
+        if (l.unproven) {
+          return "unproven";
+        } else if (l.proven) {
+          return "proven";
+        } else {
+          return "";
+        }
       })
-      .attr("marker-end", (l: any) => {
-        return l.unproven ? "url(#arrow-up)" : "url(#arrow)";
+      .attr("marker-end", (l: InternalLink) => {
+        if (l.unproven) {
+          return "url(#arrow-unproven)";
+        } else if (l.proven) {
+          return "url(#arrow-proven)";
+        } else {
+          return "url(#arrow)";
+        }
       });
 
     this.node = this.base
