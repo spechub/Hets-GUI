@@ -16,7 +16,7 @@ ReactDOM.render(
           <Grid.Column>
             <OpenFile />
           </Grid.Column>
-          <Grid.Column width={10}>
+          <Grid.Column width={13}>
             <OpenUrl />
           </Grid.Column>
         </Grid>

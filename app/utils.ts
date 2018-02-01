@@ -2,12 +2,12 @@ import * as http from "http";
 import * as querystring from "querystring";
 import * as fs from "fs";
 import * as path from "path";
-import { ConfigDesc } from "./shared/ConfigDesc";
 import { CONFIG_FILENAME } from "./shared/SharedConstants";
+import { URLType, ConfigDesc } from "./shared/Types";
 
 interface HETSApiOptions {
   readonly hostname: string;
-  readonly port: number;
+  readonly port?: number;
   readonly path: string;
 }
 
@@ -15,15 +15,29 @@ export class Utils {
   public static async queryHETSApi(
     hostname: string,
     port: number,
-    filepath: string
+    filepath: string,
+    type: URLType
   ): Promise<JSON> {
-    const escapedFileURL = querystring.escape("file:///" + filepath);
+    let escapedURL = "";
+    let hetsApiOptions: HETSApiOptions;
+    if (type === URLType.File) {
+      escapedURL = querystring.escape("file:///" + filepath);
+      hetsApiOptions = {
+        hostname: hostname,
+        port: port,
+        path: `/dg/${escapedURL}/?format=json`
+      };
+    } else if (type === URLType.Web) {
+      escapedURL = querystring.escape(filepath);
+      hetsApiOptions = {
+        hostname: hostname,
+        path: `/dg/${escapedURL}/?format=json`
+      };
+    } else {
+      console.warn("Got URL of unsupported type!");
+    }
 
-    const hetsApiOptions = {
-      hostname: hostname,
-      port: port,
-      path: `/dg/${escapedFileURL}/?format=json`
-    };
+    console.log(hetsApiOptions);
 
     try {
       return await this.getJSON(hetsApiOptions);

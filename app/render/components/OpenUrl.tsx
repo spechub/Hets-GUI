@@ -2,9 +2,12 @@ import * as React from "react";
 import { Button, Input } from "semantic-ui-react";
 
 import { IPCComm } from "../actions/IPCComm";
+import { URLType } from "../../shared/Types";
+import { QUERY_CHANNEL_RESPONSE } from "../../shared/SharedConstants";
 
 export interface OpenUrlState {
   filePath: string;
+  loading: boolean;
 }
 
 export interface OpenUrlProps {}
@@ -14,20 +17,41 @@ export class OpenUrl extends React.Component<OpenUrlProps, OpenUrlState> {
     super(props);
 
     this.state = {
-      filePath: ""
+      filePath: "",
+      loading: false
     };
+
+    IPCComm.recieveMessage(QUERY_CHANNEL_RESPONSE, () => {
+      this.setState({ loading: false });
+    });
   }
 
   render() {
     return (
       <Input
-        action={<Button onClick={() => this.onClick()}>Open Url</Button>}
         type="text"
         value={this.state.filePath}
         onChange={(e, d) => this.updateFilePath(e, d)}
         fluid={true}
-        placeholder="Url to file ..."
-      />
+        placeholder="Url or Path ..."
+        action={true}
+      >
+        <input />
+        <Button
+          loading={this.state.loading}
+          disabled={this.state.loading}
+          onClick={() => this.openFile()}
+        >
+          Open File
+        </Button>
+        <Button
+          loading={this.state.loading}
+          disabled={this.state.loading}
+          onClick={() => this.openWeb()}
+        >
+          Open Web
+        </Button>
+      </Input>
     );
   }
 
@@ -40,7 +64,13 @@ export class OpenUrl extends React.Component<OpenUrlProps, OpenUrlState> {
     });
   }
 
-  private onClick() {
-    IPCComm.queryHets(this.state.filePath);
+  private openFile() {
+    this.setState({ loading: true });
+    IPCComm.queryHets(this.state.filePath, URLType.File);
+  }
+
+  private openWeb() {
+    this.setState({ loading: true });
+    IPCComm.queryHets(this.state.filePath, URLType.Web);
   }
 }

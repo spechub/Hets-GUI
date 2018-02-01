@@ -5,16 +5,18 @@ import {
   CONFIG_GET_CHANNEL,
   OPEN_FILE
 } from "../../shared/SharedConstants";
-import { ConfigDesc } from "../../shared/ConfigDesc";
+import { URLType, ConfigDesc } from "../../shared/Types";
 
 export class IPCComm {
-  public static queryHets(file: string) {
+  public static queryHets(file: string, type: URLType) {
     const config = ipcRenderer.sendSync(CONFIG_GET_CHANNEL) as ConfigDesc;
 
     const message = {
       file: file,
-      hostname: config.hets_hostname,
-      port: config.hets_port
+      hostname:
+        type === URLType.File ? config.hets_hostname : config.hets_web_url,
+      port: config.hets_port,
+      type: type
     };
 
     remote.getCurrentWindow().setTitle(

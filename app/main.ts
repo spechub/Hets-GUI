@@ -10,6 +10,7 @@ import {
   OPEN_FILE,
   OPEN_FILE_CANCEL
 } from "./shared/SharedConstants";
+import { URLType } from "./shared/Types";
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -63,7 +64,7 @@ app.on("activate", () => {
 });
 
 ipcMain.on(QUERY_CHANNEL, (event: Event, message: any) => {
-  Utils.queryHETSApi(message.hostname, message.port, message.file)
+  Utils.queryHETSApi(message.hostname, message.port, message.file, message.type)
     .catch((err: Error) => {
       console.error(err.message);
       dialog.showErrorBox("Network Error", err.message);
@@ -90,7 +91,7 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
       if (paths != undefined) {
         const path = paths[0];
         console.log('==> Open File: "' + path + '"');
-        Utils.queryHETSApi(message.hostname, message.port, path)
+        Utils.queryHETSApi(message.hostname, message.port, path, URLType.File)
           .catch((err: Error) => {
             console.error(err.message);
             dialog.showErrorBox("Network Error", err.message);
