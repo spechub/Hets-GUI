@@ -7,7 +7,8 @@ import {
   QUERY_CHANNEL,
   QUERY_CHANNEL_RESPONSE,
   CONFIG_GET_CHANNEL,
-  OPEN_FILE
+  OPEN_FILE,
+  OPEN_FILE_CANCEL
 } from "./shared/SharedConstants";
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -97,6 +98,8 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
           .then((res: JSON) => {
             event.sender.send(QUERY_CHANNEL_RESPONSE, res);
           });
+      } else {
+        event.sender.send(OPEN_FILE_CANCEL);
       }
     }
   );
