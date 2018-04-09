@@ -6,6 +6,7 @@ import { IPCComm } from "../actions/IPCComm";
 import { DGraphParser } from "../actions/DGraphParser";
 import { QUERY_CHANNEL_RESPONSE } from "../../shared/SharedConstants";
 import { GraphControls } from "./GraphControls";
+import { TestGraphql } from "../actions/GraphQLHelper";
 
 export interface FDGraphProps {
   width: string;
@@ -51,6 +52,8 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
 
   constructor(props: any) {
     super(props);
+
+    new TestGraphql();
 
     IPCComm.recieveMessage(QUERY_CHANNEL_RESPONSE, this.displayResp.bind(this));
     this.internalEdges = false;

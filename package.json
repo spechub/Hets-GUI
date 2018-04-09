@@ -23,7 +23,7 @@
     "awesome-typescript-loader": "^3.4.1",
     "css-loader": "^0.28.9",
     "d3": "^4.12.0",
-    "electron": "1.7.11",
+    "electron": "^1.8.4",
     "file-loader": "^1.1.6",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -34,5 +34,11 @@
     "typescript": "^2.6.2",
     "webpack": "^3.10.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/graphql": "^0.13.0",
+    "apollo-boost": "^0.1.4",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.8.0",
+    "react-apollo": "^2.1.3"
+  }
 }
