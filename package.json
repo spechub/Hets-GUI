@@ -23,7 +23,7 @@
     "awesome-typescript-loader": "^3.4.1",
     "css-loader": "^0.28.9",
     "d3": "^4.12.0",
-    "electron": "1.7.11",
+    "electron": "^1.8.4",
     "file-loader": "^1.1.6",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
