@@ -7,11 +7,9 @@ import { OpenUrl } from "./components/OpenUrl";
 import { FDGraph } from "./components/FDGraph";
 import { OpenFile } from "./components/OpenFile";
 import { Grid, Container } from "semantic-ui-react";
-import Helper from "./actions/GraphQLHelper";
 
 ReactDOM.render(
   <>
-    <Helper />
     <Container fluid={true}>
       <Grid columns={1}>
         <Grid.Column>
