@@ -6,9 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron app",
     "build": "npm run build-render && npm run build-base",
-    "build-render": "webpack --config webpack.render.js",
-    "watch-render": "webpack --config webpack.render.js -w",
-    "build-base": "webpack --config webpack.base.js"
+    "build-render": "webpack --config webpack.render.js --mode=development",
+    "watch-render": "webpack --config webpack.render.js --mode=development -w",
+    "build-base": "webpack --config webpack.base.js --mode=development"
   },
   "repository": {
     "type": "git",
