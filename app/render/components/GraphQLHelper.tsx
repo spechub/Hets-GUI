@@ -1,56 +1,50 @@
-import { ipcRenderer } from "electron";
-
 import * as React from "react";
 import gql from "graphql-tag";
-import ApolloClient from "apollo-boost";
-import { Query } from "react-apollo";
 
-import { ConfigDesc } from "../../shared/Types";
+import { graphql, ChildProps } from "react-apollo";
 
-import { CONFIG_GET_CHANNEL } from "../../shared/SharedConstants";
-
-export class QueryGraphQL extends React.Component<{}, {}> {
-  private QUERY: any;
-
-  constructor() {
-    super({});
-
-    const config = ipcRenderer.sendSync(CONFIG_GET_CHANNEL) as ConfigDesc;
-
-    const link = new ApolloClient({
-      uri: `http://${config.hets_hostname}:${config.hets_port}/graphql`
-    });
-
-    this.QUERY = gql`
-      query DGraph($locId: String!) {
-        dgraph(locId: $locId) {
-          name
-        }
-      }
-    `;
-  }
-
-  render() {
-    return <Query query={this.QUERY} />;
-  }
-}
-
-type Response = {
-  dgraph: any;
+type dgraph = {
+  name: string;
 };
 
-type Variables = {
+type InputProps = {
   locId: string;
 };
 
-const foo = graphql<{}, Response, Variables>(QUERY, {
-  options: () => ({
-    variables: {
-      locId: "file:///home/ysengrimm/Desktop/Hets-lib/Basic/Algebra_I.casl"
+type Response = {
+  dgraph: dgraph;
+};
+
+// type Variables = {
+//   locId: string;
+// };
+
+const QUERY = gql`
+  query DGraph($locId: String!) {
+    dgraph(locId: $locId) {
+      name
     }
+  }
+`;
+
+const withLocId = graphql<InputProps, Response>(QUERY, {
+  options: ({ locId }) => ({
+    variables: { locId }
   })
 });
 
-export default () => {
-  <ApolloProvider client={client}>foo()</ApolloProvider>;
-};
+// class AllPeopleQuery extends Query<dgraph, Variables> {}
+
+class QueryGraphQL extends React.Component<
+  ChildProps<InputProps, Response>,
+  {}
+> {
+  render() {
+    const { loading, dgraph, error } = this.props.data;
+    if (loading) return <p>loading</p>;
+    if (error) return <p>error</p>;
+    return <div>`${dgraph}`</div>;
+  }
+}
+
+export default withLocId(QueryGraphQL);
