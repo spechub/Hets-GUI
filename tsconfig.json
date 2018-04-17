@@ -12,11 +12,7 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "lib": [
-      "es2016",
-      "dom",
-      "scripthost"
-    ]
+    "lib": ["es2016", "dom", "scripthost", "esnext.asynciterable"]
     // won't work with electron typings
     // "strictNullChecks": true,
     // "strictFunctionTypes": true
