@@ -10,7 +10,7 @@ import { CONFIG_GET_CHANNEL } from "../shared/SharedConstants";
 // import { OpenUrl } from "./components/OpenUrl";
 // import { FDGraph } from "./components/FDGraph";
 // import { OpenFile } from "./components/OpenFile";
-import GraphQLHelper from "./components/GraphQLHelper";
+import QueryDGraph from "./components/DGraph";
 
 import "semantic-ui-css/semantic.min.css";
 
@@ -21,7 +21,7 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <GraphQLHelper
+    <QueryDGraph
       locId={"file:///home/ysengrimm/Desktop/Hets-lib/Basic/Algebra_I.casl"}
     />
     {/*

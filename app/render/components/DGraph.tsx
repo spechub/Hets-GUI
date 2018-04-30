@@ -3,7 +3,9 @@ import gql from "graphql-tag";
 
 import { graphql, ChildProps } from "react-apollo";
 
-type Dgraph = {
+import Oms from "./Oms";
+
+type DGraph = {
   name: string;
   display_name: string;
   loc_id: string;
@@ -33,19 +35,15 @@ type Dgraph = {
   ];
 };
 
-type InputProps = {
+type DGraphInputProps = {
   locId: string;
 };
 
-type Response = {
-  dgraph: Dgraph;
+type DGraphResponse = {
+  dgraph: DGraph;
 };
 
-// type Variables = {
-//   locId: string;
-// };
-
-const QUERY = gql`
+const QUERY_DGRAPH = gql`
   query DGraph($locId: String!) {
     dgraph(locId: $locId) {
       name
@@ -54,33 +52,23 @@ const QUERY = gql`
   }
 `;
 
-const withLocId = graphql<InputProps, Response>(QUERY, {
+const withLocId = graphql<DGraphInputProps, DGraphResponse>(QUERY_DGRAPH, {
   options: ({ locId }) => ({
-    variables: { locId }
+    variables: { locId: locId }
   })
 });
 
-// class AllPeopleQuery extends Query<dgraph, Variables> {}
-
-class QueryGraphQL extends React.Component<
-  ChildProps<InputProps, Response>,
+class QueryDGraph extends React.Component<
+  ChildProps<DGraphInputProps, DGraphResponse>,
   {}
 > {
   render() {
-    const { loading, dgraph, error } = this.props.data;
+    const { loading, error } = this.props.data;
+
     if (loading) return <p>loading</p>;
     if (error) return <p>error</p>;
-    return (
-      <>
-        <div>{dgraph.name}</div>
-        <ul>
-          {dgraph.oms_list.map(oms => {
-            return <li>{oms.loc_id}</li>;
-          })}
-        </ul>
-      </>
-    );
+    return <Oms sigId={1} />;
   }
 }
 
-export default withLocId(QueryGraphQL);
+export default withLocId(QueryDGraph);
