@@ -21,12 +21,12 @@ type DGraph = {
     }
   ];
   document_links_target: Array<any>; // TODO: needs more typing
-  oms_list: [
+  omsList: [
     {
       display_name: string;
       label_has_free: boolean;
       label_has_hiding: boolean;
-      loc_id: string;
+      locId: string;
       name: string;
       name_extension: string;
       name_extension_index: number;
@@ -47,7 +47,11 @@ const QUERY_DGRAPH = gql`
   query DGraph($locId: String!) {
     dgraph(locId: $locId) {
       name
-      oms_list
+      ... on Library {
+        omsList: oms(limit: null) {
+          locId
+        }
+      }
     }
   }
 `;
@@ -63,11 +67,19 @@ class QueryDGraph extends React.Component<
   {}
 > {
   render() {
-    const { loading, error } = this.props.data;
+    const { loading, dgraph, error } = this.props.data;
 
     if (loading) return <p>loading</p>;
     if (error) return <p>error</p>;
-    return <Oms sigId={1} />;
+    return (
+      <>
+        <p>{dgraph.name}</p>
+        <hr />
+        {dgraph.omsList.map(id => {
+          return <Oms key={id.locId} locId={id.locId} />;
+        })}
+      </>
+    );
   }
 }
 
