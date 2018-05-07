@@ -1,12 +1,9 @@
-import { /*remote,*/ ipcRenderer } from "electron";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
 // import { Grid, Container } from "semantic-ui-react";
 
-import { ConfigDesc } from "../shared/Types";
-import { CONFIG_GET_CHANNEL } from "../shared/SharedConstants";
 // import { OpenUrl } from "./components/OpenUrl";
 // import { FDGraph } from "./components/FDGraph";
 // import { OpenFile } from "./components/OpenFile";
@@ -14,9 +11,8 @@ import QueryDGraph from "./components/DGraph";
 
 import "semantic-ui-css/semantic.min.css";
 
-const config = ipcRenderer.sendSync(CONFIG_GET_CHANNEL) as ConfigDesc;
 const client = new ApolloClient({
-  uri: `http://${config.hets_hostname}:${config.hets_port}/graphql`
+  uri: `http://localhost:8040/graphql`
 });
 
 ReactDOM.render(
