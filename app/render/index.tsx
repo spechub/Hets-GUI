@@ -7,7 +7,8 @@ import { ApolloProvider } from "react-apollo";
 // import { OpenUrl } from "./components/OpenUrl";
 // import { FDGraph } from "./components/FDGraph";
 // import { OpenFile } from "./components/OpenFile";
-import QueryDGraph from "./components/DGraph";
+import QueryDGraph from "./components/graphql/DGraph";
+import AjMatrix from "./components/AjMatrix";
 
 import "semantic-ui-css/semantic.min.css";
 
@@ -19,6 +20,7 @@ ReactDOM.render(
   <ApolloProvider client={client}>
     <QueryDGraph
       locId={"file:///home/ysengrimm/Desktop/Hets-lib/Basic/Algebra_I.casl"}
+      children={props => <AjMatrix {...props} />}
     />
     {/*
     <Container fluid={true}>

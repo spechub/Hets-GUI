@@ -3,11 +3,9 @@ import gql from "graphql-tag";
 
 import { graphql, ChildProps } from "react-apollo";
 
-import Oms from "./Oms";
-
-type DGraph = {
+export type DGraph = {
   name: string;
-  display_name: string;
+  displayName: string;
   loc_id: string;
   version: string;
   document_links_source: [
@@ -23,7 +21,7 @@ type DGraph = {
   document_links_target: Array<any>; // TODO: needs more typing
   omsList: [
     {
-      display_name: string;
+      displayName: string;
       label_has_free: boolean;
       label_has_hiding: boolean;
       locId: string;
@@ -37,9 +35,10 @@ type DGraph = {
 
 type DGraphInputProps = {
   locId: string;
+  children: (props: { dgraph: DGraph }) => JSX.Element;
 };
 
-type DGraphResponse = {
+export type DGraphResponse = {
   dgraph: DGraph;
 };
 
@@ -50,6 +49,7 @@ const QUERY_DGRAPH = gql`
       ... on Library {
         omsList: oms(limit: null) {
           locId
+          displayName
         }
       }
     }
@@ -68,18 +68,12 @@ class QueryDGraph extends React.Component<
 > {
   render() {
     const { loading, dgraph, error } = this.props.data;
+    const { children } = this.props;
 
     if (loading) return <p>loading</p>;
     if (error) return <p>error</p>;
-    return (
-      <>
-        <p>{dgraph.name}</p>
-        <hr />
-        {dgraph.omsList.map(id => {
-          return <Oms key={id.locId} locId={id.locId} />;
-        })}
-      </>
-    );
+
+    return children({ dgraph });
   }
 }
 

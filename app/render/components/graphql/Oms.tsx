@@ -1,10 +1,8 @@
 import * as React from "react";
 import gql from "graphql-tag";
-
 import { graphql, ChildProps } from "react-apollo";
-import { CSSProperties } from "react";
 
-type OMS = {
+export type OMS = {
   name: string;
   conservativity_status: {
     required: string;
@@ -14,6 +12,7 @@ type OMS = {
 
 type OmsInputProps = {
   locId: string;
+  children: (props: { oms: OMS }) => JSX.Element;
 };
 
 type OmsResponse = {
@@ -34,25 +33,21 @@ const withOms = graphql<OmsInputProps, OmsResponse>(OMS_QUERY, {
   })
 });
 
-const redText: CSSProperties = {
-  color: "red"
-};
-
 class QueryOms extends React.Component<
   ChildProps<OmsInputProps, OmsResponse>,
   {}
 > {
   render() {
     const { loading, oms, error } = this.props.data;
+    const { children } = this.props;
     if (loading) {
       return <div>loading oms</div>;
     }
     if (error) {
-      console.log(error);
-      return <div style={redText}>error oms {this.props.locId}</div>;
+      return <div>error</div>;
     }
 
-    return <div>{oms.name}</div>;
+    return children({ oms });
   }
 }
 
