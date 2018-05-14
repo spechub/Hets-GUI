@@ -6,7 +6,7 @@
     "target": "ES6",
     "jsx": "react",
     "noEmitOnError": true,
-    // "noImplicitAny": true,
+    "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
