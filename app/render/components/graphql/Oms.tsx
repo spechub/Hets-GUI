@@ -12,7 +12,7 @@ export type OMS = {
 
 type OmsInputProps = {
   locId: string;
-  children: (props: { oms: OMS }) => JSX.Element;
+  children: (props: { oms: OMS }) => any;
 };
 
 type OmsResponse = {
@@ -47,7 +47,8 @@ class QueryOms extends React.Component<
       return <div>error</div>;
     }
 
-    return children({ oms });
+    children({ oms });
+    return <div />;
   }
 }
 
