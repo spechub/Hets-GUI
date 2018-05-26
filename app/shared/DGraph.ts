@@ -18,6 +18,7 @@ export interface DGLink {
   linkid: number;
   source: string;
   target: string;
+  name?: string;
 }
 
 export interface DGNode {
@@ -32,6 +33,24 @@ export interface DGNode {
   refname: string;
   relxpath: string;
   internal: boolean;
+}
+
+export class DGNode {
+  constructor(id: number) {
+    return {
+      Axioms: [],
+      Declarations: [],
+      Theorems: [],
+      id: id,
+      logic: "",
+      name: "DUMMY",
+      range: "",
+      reference: false,
+      refname: "",
+      relxpath: "",
+      internal: true
+    };
+  }
 }
 
 export interface Global {

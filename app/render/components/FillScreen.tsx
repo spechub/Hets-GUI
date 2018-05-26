@@ -25,7 +25,7 @@ export class FillScreen extends React.Component<Props, State> {
 
     remote.getCurrentWindow().on("resize", () => {
       clearTimeout(this.timer);
-      // This error is not an error ¯\_(ツ)_/¯
+      // error shown in vscode but compiles just fine
       this.timer = setTimeout(this.handleResize, 50);
     });
   }

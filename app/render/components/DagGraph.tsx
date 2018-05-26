@@ -7,6 +7,7 @@ import { IPCComm } from "../actions/IPCComm";
 import { QUERY_CHANNEL_RESPONSE } from "../../shared/SharedConstants";
 import { DGraphParser } from "../actions/DGraphParser";
 import { DGLink, DGNode } from "../../shared/DGraph";
+import { removeInternalEdges } from "../actions/GraphHelper";
 
 type DagGraphState = {
   graph?: dagreD3.graphlib.Graph;
@@ -21,8 +22,6 @@ type DagGraphProps = {
 
 export class DagGraph extends Component<DagGraphProps, DagGraphState> {
   baseSvg: SVGSVGElement;
-  graph: dagreD3.graphlib.Graph;
-  nodes: { id: string; name?: string; internal?: boolean }[];
 
   constructor(props: DagGraphProps) {
     super(props);
@@ -32,18 +31,10 @@ export class DagGraph extends Component<DagGraphProps, DagGraphState> {
       this.queryResponse.bind(this)
     );
 
-    this.graph = new dagreD3.graphlib.Graph()
-      .setGraph({})
-      .setDefaultEdgeLabel(() => {
-        return {};
-      });
-
     this.state = {
       nodes: [],
       edges: []
     };
-
-    this.nodes = [];
 
     this.displayGraph = this.displayGraph.bind(this);
   }
@@ -63,6 +54,11 @@ export class DagGraph extends Component<DagGraphProps, DagGraphState> {
   }
 
   private displayGraph() {
+    const graph = new dagreD3.graphlib.Graph()
+      .setGraph({})
+      .setDefaultEdgeLabel(() => {
+        return {};
+      });
     const svg = d3.select(this.baseSvg);
     svg.selectAll("g").remove();
     const g = svg.append("g") as any;
@@ -73,15 +69,29 @@ export class DagGraph extends Component<DagGraphProps, DagGraphState> {
     svg.call(zoom);
 
     this.state.nodes.forEach(n => {
-      this.graph.setNode(n.id.toString(), { label: n.name });
+      graph.setNode(n.id.toString(), { label: n.name });
     });
 
     this.state.edges.forEach(e => {
-      this.graph.setEdge(e.id_source.toString(), e.id_target.toString());
+      graph.setEdge(e.id_source.toString(), e.id_target.toString(), {
+        label: e.name ? e.name : e.Type,
+        style: e.Type.includes("Unproven")
+          ? "stroke: #f66; fill: none;"
+          : e.Type.includes("Proven")
+            ? "stroke: #b8db95; fill: none;"
+            : "",
+        arrowheadStyle: e.Type.includes("Unproven")
+          ? "stroke: #f66; fill: #f66;"
+          : e.Type.includes("Proven")
+            ? "stroke: #b8db95; fill: #b8db95;"
+            : ""
+      });
     });
 
+    const cleanGraph = removeInternalEdges(this.state.edges, this.state.nodes);
+
     const render = new dagreD3.render();
-    render(g, this.graph);
+    render(g, cleanGraph);
 
     const initialScale = 0.75;
     svg.call(
@@ -89,7 +99,7 @@ export class DagGraph extends Component<DagGraphProps, DagGraphState> {
       d3.zoomIdentity
         .translate(
           (Number(svg.attr("width")) -
-            this.graph.graph().width * initialScale) /
+            cleanGraph.graph().width * initialScale) /
             2,
           20
         )

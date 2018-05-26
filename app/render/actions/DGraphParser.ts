@@ -22,6 +22,7 @@ class DGLinkImpl implements DGLink, Serializable<DGLink> {
   linkid: number;
   source: string;
   target: string;
+  name?: string;
 
   deserialize(input: any): DGLink {
     this.ConsStatus = input["ConsStatus"] ? input["ConsStatus"] : null;
@@ -31,6 +32,7 @@ class DGLinkImpl implements DGLink, Serializable<DGLink> {
     this.linkid = input["linkid"];
     this.source = input["source"];
     this.target = input["target"];
+    this.name = input["name"] ? input["name"] : null;
 
     return this;
   }
