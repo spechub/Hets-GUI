@@ -16,7 +16,8 @@ export class IPCComm {
       hostname:
         type === URLType.File ? config.hets_hostname : config.hets_web_url,
       port: config.hets_port,
-      type: type
+      type: type,
+      command_list: ""
     };
 
     remote.getCurrentWindow().setTitle(
@@ -40,7 +41,8 @@ export class IPCComm {
     const config = ipcRenderer.sendSync(CONFIG_GET_CHANNEL) as ConfigDesc;
     const message = {
       hostname: config.hets_hostname,
-      port: config.hets_port
+      port: config.hets_port,
+      command_list: ""
     };
 
     ipcRenderer.send(OPEN_FILE, message);

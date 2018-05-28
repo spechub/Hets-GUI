@@ -16,16 +16,18 @@ export class Utils {
     hostname: string,
     port: number,
     filepath: string,
-    type: URLType
+    type: URLType,
+    command_list: string
   ): Promise<JSON> {
     let escapedURL = "";
     let hetsApiOptions: HETSApiOptions;
     if (type === URLType.File) {
       escapedURL = querystring.escape("file:///" + filepath);
+      console.log(escapedURL);
       hetsApiOptions = {
         hostname: hostname,
         port: port,
-        path: `/dg/${escapedURL}/?format=json`
+        path: `/dg/${escapedURL}/${command_list}?format=json`
       };
     } else if (type === URLType.Web) {
       escapedURL = querystring.escape(filepath);

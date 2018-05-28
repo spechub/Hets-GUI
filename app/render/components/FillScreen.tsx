@@ -30,10 +30,17 @@ export class FillScreen extends React.Component<Props, State> {
     });
   }
 
+  componentDidMount() {
+    this.handleResize();
+  }
+
   private handleResize() {
+    const sidebarWidth = document.querySelector("#info_sidebar").clientWidth;
+    const topbarHeight = document.querySelector("#top").clientHeight;
     this.setState({
-      width: remote.getCurrentWindow().getContentSize()[0] - 16,
-      height: remote.getCurrentWindow().getContentSize()[1] - 150
+      width:
+        remote.getCurrentWindow().getContentSize()[0] - (16 + sidebarWidth),
+      height: remote.getCurrentWindow().getContentSize()[1] - (topbarHeight + 5)
     });
   }
 

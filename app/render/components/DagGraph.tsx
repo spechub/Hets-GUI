@@ -3,38 +3,21 @@ import { Component } from "react";
 import * as d3 from "d3";
 import * as dagreD3 from "dagre-d3";
 
-import { IPCComm } from "../actions/IPCComm";
-import { QUERY_CHANNEL_RESPONSE } from "../../shared/SharedConstants";
-import { DGraphParser } from "../actions/DGraphParser";
-import { DGLink, DGNode } from "../../shared/DGraph";
-import { removeInternalEdges } from "../actions/GraphHelper";
-
-type DagGraphState = {
-  graph?: dagreD3.graphlib.Graph;
-  edges: DGLink[];
-  nodes: DGNode[];
-};
-
-type DagGraphProps = {
+export type DagGraphProps = {
   width: number;
   height: number;
+  graph: dagreD3.graphlib.Graph;
+  onSelectNode: (node: dagreD3.Node) => void;
 };
 
-export class DagGraph extends Component<DagGraphProps, DagGraphState> {
+export class DagGraph extends Component<DagGraphProps, {}> {
   baseSvg: SVGSVGElement;
+  scale: { k: number; x: number; y: number };
 
   constructor(props: DagGraphProps) {
     super(props);
 
-    IPCComm.recieveMessage(
-      QUERY_CHANNEL_RESPONSE,
-      this.queryResponse.bind(this)
-    );
-
-    this.state = {
-      nodes: [],
-      edges: []
-    };
+    this.scale = { k: 0.75, x: 0, y: 0 };
 
     this.displayGraph = this.displayGraph.bind(this);
   }
@@ -47,63 +30,33 @@ export class DagGraph extends Component<DagGraphProps, DagGraphState> {
     this.displayGraph();
   }
 
-  private queryResponse(_e: any, s: any) {
-    const g = new DGraphParser(s);
-
-    this.setState({ edges: g.dgraph.DGLinks, nodes: g.dgraph.DGNodes });
-  }
-
   private displayGraph() {
-    const graph = new dagreD3.graphlib.Graph()
-      .setGraph({})
-      .setDefaultEdgeLabel(() => {
-        return {};
-      });
+    if (!this.props.graph) {
+      return;
+    }
+
     const svg = d3.select(this.baseSvg);
     svg.selectAll("g").remove();
     const g = svg.append("g") as any;
 
     const zoom = d3.zoom().on("zoom", () => {
       g.attr("transform", d3.event.transform);
+      this.scale = d3.event.transform;
     });
     svg.call(zoom);
 
-    this.state.nodes.forEach(n => {
-      graph.setNode(n.id.toString(), { label: n.name });
-    });
-
-    this.state.edges.forEach(e => {
-      graph.setEdge(e.id_source.toString(), e.id_target.toString(), {
-        label: e.name ? e.name : e.Type,
-        style: e.Type.includes("Unproven")
-          ? "stroke: #f66; fill: none;"
-          : e.Type.includes("Proven")
-            ? "stroke: #b8db95; fill: none;"
-            : "",
-        arrowheadStyle: e.Type.includes("Unproven")
-          ? "stroke: #f66; fill: #f66;"
-          : e.Type.includes("Proven")
-            ? "stroke: #b8db95; fill: #b8db95;"
-            : ""
-      });
-    });
-
-    const cleanGraph = removeInternalEdges(this.state.edges, this.state.nodes);
+    const graph = this.props.graph;
 
     const render = new dagreD3.render();
-    render(g, cleanGraph);
+    render(g, graph);
 
-    const initialScale = 0.75;
+    g.selectAll("g.node").on("click", (v: string) => {
+      this.props.onSelectNode(graph.node(v));
+    });
+
     svg.call(
       zoom.transform,
-      d3.zoomIdentity
-        .translate(
-          (Number(svg.attr("width")) -
-            cleanGraph.graph().width * initialScale) /
-            2,
-          20
-        )
-        .scale(initialScale)
+      d3.zoomIdentity.translate(this.scale.x, this.scale.y).scale(this.scale.k)
     );
   }
 

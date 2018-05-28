@@ -64,7 +64,13 @@ app.on("activate", () => {
 });
 
 ipcMain.on(QUERY_CHANNEL, (event: Event, message: any) => {
-  Utils.queryHETSApi(message.hostname, message.port, message.file, message.type)
+  Utils.queryHETSApi(
+    message.hostname,
+    message.port,
+    message.file,
+    message.type,
+    message.command_list
+  )
     .catch((err: Error) => {
       console.error(err.message);
       dialog.showErrorBox("Network Error", err.message);
@@ -91,7 +97,13 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
       if (paths != undefined) {
         const path = paths[0];
         console.log('==> Open File: "' + path + '"');
-        Utils.queryHETSApi(message.hostname, message.port, path, URLType.File)
+        Utils.queryHETSApi(
+          message.hostname,
+          message.port,
+          path,
+          URLType.File,
+          message.command_list
+        )
           .catch((err: Error) => {
             console.error(err.message);
             dialog.showErrorBox("Network Error", err.message);

@@ -1,26 +1,10 @@
-import { DGLink, DGNode } from "../../shared/DGraph";
 import * as dagreD3 from "dagre-d3";
 
 // TODO: optimize
 // maybe pre filter *proven edges
 export function removeInternalEdges(
-  edges: DGLink[],
-  nodes: DGNode[]
+  graph: dagreD3.graphlib.Graph
 ): dagreD3.graphlib.Graph {
-  const graph = new dagreD3.graphlib.Graph()
-    .setGraph({})
-    .setDefaultEdgeLabel(() => {
-      return {};
-    });
-
-  nodes.forEach(e => {
-    graph.setNode(e.id.toString(), { internal: e.internal, label: e.name });
-  });
-
-  edges.forEach(e => {
-    graph.setEdge(e.id_source.toString(), e.id_target.toString());
-  });
-
   for (const n of graph.nodes()) {
     if (!graph.node(n).internal) {
       continue;
