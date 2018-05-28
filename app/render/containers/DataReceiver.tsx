@@ -40,7 +40,17 @@ class DataReceiver extends React.Component<DataReceiverProps, {}> {
       });
 
     nodes.forEach(n => {
-      graph.setNode(n.id.toString(), { label: n.name });
+      graph.setNode(n.id.toString(), {
+        label: n.name,
+        axioms: n.Axioms,
+        declarations: n.Declarations,
+        theorems: n.Theorems,
+        logic: n.logic,
+        internal: n.internal,
+        reference: n.reference,
+        Reference: n.Reference,
+        style: n.reference ? "fill: #e0de6d" : ""
+      });
     });
 
     edges.forEach(e => {

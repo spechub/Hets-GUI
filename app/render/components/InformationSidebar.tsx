@@ -15,7 +15,23 @@ export class InformationSidebar extends React.Component<
 
   render() {
     return (
-      <h1>{this.props.node ? this.props.node.label : "no node selected :("}</h1>
+      <>
+        {this.props.node ? (
+          <>
+            <h3>{this.props.node.label}</h3>
+            <p>{this.props.node.logic}</p>
+            <p>
+              {this.props.node.Reference
+                ? this.props.node.Reference.library
+                : ""}
+            </p>
+            <p>{this.props.node.declarations}</p>
+            <p>{this.props.node.theorems}</p>
+          </>
+        ) : (
+          <h3>no node selected :(</h3>
+        )}
+      </>
     );
   }
 }

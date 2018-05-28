@@ -6,7 +6,8 @@ import {
   GMorphism,
   Axiom,
   Declaration,
-  Theorem
+  Theorem,
+  Reference
 } from "../../shared/DGraph";
 
 interface Serializable<T> {
@@ -38,6 +39,20 @@ class DGLinkImpl implements DGLink, Serializable<DGLink> {
   }
 }
 
+class ReferenceImpl implements Reference, Serializable<Reference> {
+  library: string;
+  location: string;
+  node: string;
+
+  deserialize(input: any) {
+    this.library = input["library"];
+    this.location = input["location"];
+    this.node = input["node"];
+
+    return this;
+  }
+}
+
 class DGNodeImpl implements DGNode, Serializable<DGNode> {
   Axioms: Axiom[];
   Declarations: Declaration[];
@@ -47,6 +62,7 @@ class DGNodeImpl implements DGNode, Serializable<DGNode> {
   name: string;
   range: string;
   reference: boolean;
+  Reference: Reference;
   refname: string;
   relxpath: string;
   internal: boolean;
@@ -60,6 +76,11 @@ class DGNodeImpl implements DGNode, Serializable<DGNode> {
     this.refname = input["refname"];
     this.relxpath = input["relxpath"];
     this.internal = input["internal"];
+
+    this.Reference = null;
+    if (input["Reference"]) {
+      this.Reference = new ReferenceImpl().deserialize(input["Reference"]);
+    }
 
     return this;
   }

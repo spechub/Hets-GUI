@@ -21,6 +21,12 @@ export interface DGLink {
   name?: string;
 }
 
+export interface Reference {
+  library: string;
+  location: string;
+  node: string;
+}
+
 export interface DGNode {
   Axioms: Axiom[];
   Declarations: Declaration[];
@@ -30,6 +36,7 @@ export interface DGNode {
   name: string;
   range: string; // TODO: see range in Global
   reference: boolean;
+  Reference: Reference;
   refname: string;
   relxpath: string;
   internal: boolean;
@@ -46,6 +53,7 @@ export class DGNode {
       name: "DUMMY",
       range: "",
       reference: false,
+      Reference: null,
       refname: "",
       relxpath: "",
       internal: true
