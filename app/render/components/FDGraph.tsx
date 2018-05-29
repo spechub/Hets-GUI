@@ -1,15 +1,15 @@
 import * as React from "react";
 import * as d3 from "d3";
-import { Event, remote } from "electron";
+import { Event } from "electron";
 
-import { IPCComm } from "../actions/IPCComm";
-import { DGraphParser } from "../actions/DGraphParser";
-import { QUERY_CHANNEL_RESPONSE } from "../../shared/SharedConstants";
 import { GraphControls } from "./GraphControls";
+import { DGNode, DGLink } from "../../shared/DGraph";
 
 export interface FDGraphProps {
   width: string;
   height: string;
+  nodes: DGNode[];
+  edges: DGLink[];
 }
 
 interface FDGraphState {
@@ -38,8 +38,6 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
   simulation: d3.Simulation<any, any>;
   base: d3.Selection<Element, any, HTMLElement, any>;
 
-  graph: DGraphParser;
-
   link: any;
   node: any;
 
@@ -52,21 +50,17 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
   constructor(props: any) {
     super(props);
 
-    IPCComm.recieveMessage(QUERY_CHANNEL_RESPONSE, this.displayResp.bind(this));
     this.internalEdges = false;
     this.internalNodes = true;
-
-    remote.getCurrentWindow().on("resize", () => {
-      console.log("resize");
-      this.setState({
-        width: remote.getCurrentWindow().getContentSize()[0] - 16,
-        height: remote.getCurrentWindow().getContentSize()[1] - 150
-      });
-    });
   }
 
   componentDidMount() {
     this.renderGraph();
+    this.prepareData(this.props.nodes, this.props.edges);
+  }
+
+  componentDidUpdate() {
+    this.prepareData(this.props.nodes, this.props.edges);
   }
 
   render() {
@@ -123,43 +117,24 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
 
   private showInternalEdges() {
     this.internalEdges = !this.internalEdges;
-    if (this.graph) {
-      this.prepareData(this.graph);
+    if (this.props.nodes && this.props.edges) {
+      this.prepareData(this.props.nodes, this.props.edges);
     }
   }
 
   private showInternalNodes() {
     this.internalNodes = !this.internalNodes;
-    if (this.graph) {
-      this.prepareData(this.graph);
+    if (this.props.nodes && this.props.edges) {
+      this.prepareData(this.props.nodes, this.props.edges);
     }
   }
 
-  private displayResp(_e: Event, s: any) {
-    console.groupCollapsed("==> Got response from main thread");
-    console.log(s);
-    console.groupEnd();
-    if (!s) {
-      alert("Could not open file!");
-      return;
-    }
-    this.graph = new DGraphParser(s);
-    console.groupCollapsed("==> Parsed DGraph");
-    console.log(this.graph);
-    console.groupEnd();
-    this.prepareData(this.graph);
-  }
-
-  private prepareData(graph: DGraphParser) {
-    this.base.remove();
-    this.base = this.svg.append("g");
-    this.base.attr("transform", this.currentZoomTransform);
-
+  private prepareData(n: DGNode[], e: DGLink[]) {
     const links: InternalLink[] = [];
     const nodes: InternalNode[] = [];
     const excludedNodes: number[] = [];
 
-    for (const node of graph.dgraph.DGNodes) {
+    for (const node of n) {
       if (!this.internalNodes && node.internal) {
         excludedNodes.push(node.id);
         continue;
@@ -172,7 +147,7 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
       });
     }
 
-    for (const link of graph.dgraph.DGLinks) {
+    for (const link of e) {
       if (!this.internalEdges && !link.Type.includes("Def")) {
         continue;
       }
@@ -184,7 +159,6 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
         continue;
       }
 
-      console.log(link.Type);
       links.push({
         id: link.linkid,
         source: link.id_source,
@@ -213,6 +187,10 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
   }
 
   private updateGraphRender(links: InternalLink[], nodes: any) {
+    this.base.remove();
+    this.base = this.svg.append("g");
+    this.base.attr("transform", this.currentZoomTransform);
+
     this.base
       .append("defs")
       .append("marker")

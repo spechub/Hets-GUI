@@ -13,7 +13,7 @@ import {
 import { removeInternalEdges, constructGraph } from "../actions/GraphHelper";
 import { DGNode, DGLink } from "../../shared/DGraph";
 
-export enum GraphRenderer {
+export enum EGraphRenderer {
   FORCE_DIRCETED,
   GRAPHVIZ
 }
@@ -26,7 +26,7 @@ export type HetsGuiState = {
   };
   selectedNode: dagreD3.Node;
   selectedEdge: dagreD3.GraphEdge;
-  openRenderer: GraphRenderer;
+  openRenderer: EGraphRenderer;
   svgSize: { width: number; height: number };
   internalHidden: boolean;
 };
@@ -39,7 +39,7 @@ const initialState: HetsGuiState = {
   },
   selectedNode: null,
   selectedEdge: null,
-  openRenderer: GraphRenderer.GRAPHVIZ,
+  openRenderer: EGraphRenderer.GRAPHVIZ,
   svgSize: { width: 0, height: 0 },
   internalHidden: false
 };

@@ -1,7 +1,7 @@
 import { Action } from "redux";
 import * as dagreD3 from "dagre-d3";
 
-import { GraphRenderer } from "../reducers/reducer";
+import { EGraphRenderer } from "../reducers/reducer";
 import { DGNode, DGLink } from "../../shared/DGraph";
 
 export interface HetsGuiActions extends Action {
@@ -12,7 +12,7 @@ export interface HetsGuiActions extends Action {
   };
   node?: dagreD3.Node;
   edge?: dagreD3.GraphEdge;
-  renderer?: GraphRenderer;
+  renderer?: EGraphRenderer;
   size?: { width: number; height: number };
 }
 
@@ -39,7 +39,7 @@ export function selectEdgeAction(edge: dagreD3.GraphEdge): HetsGuiActions {
 }
 
 export const SET_RENDERER = "SET_RENDERER";
-export function changeRendererAction(renderer: GraphRenderer): HetsGuiActions {
+export function changeRendererAction(renderer: EGraphRenderer): HetsGuiActions {
   return { type: SET_RENDERER, renderer: renderer };
 }
 

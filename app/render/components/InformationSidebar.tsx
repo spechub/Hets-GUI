@@ -2,13 +2,16 @@ import * as React from "react";
 import * as dagreD3 from "dagre-d3";
 import { Button } from "semantic-ui-react";
 import { Theorem, Declaration } from "../../shared/DGraph";
+import { EGraphRenderer } from "../reducers/reducer";
 
 export interface InformationSidebarProps {
   node: dagreD3.Node;
   edge: dagreD3.GraphEdge;
   hidden: boolean;
+  renderer: EGraphRenderer;
   onHideInternal: () => void;
   onShowInternal: () => void;
+  onSwitchRenderer: (renderer: EGraphRenderer) => void;
 }
 
 export class InformationSidebar extends React.Component<
@@ -37,6 +40,23 @@ export class InformationSidebar extends React.Component<
             }}
           >
             Hide internal
+          </Button>
+        )}
+        {this.props.renderer === EGraphRenderer.GRAPHVIZ ? (
+          <Button
+            onClick={() => {
+              this.props.onSwitchRenderer(EGraphRenderer.FORCE_DIRCETED);
+            }}
+          >
+            switch renderer
+          </Button>
+        ) : (
+          <Button
+            onClick={() => {
+              this.props.onSwitchRenderer(EGraphRenderer.GRAPHVIZ);
+            }}
+          >
+            switch renderer
           </Button>
         )}
         {this.props.node ? (

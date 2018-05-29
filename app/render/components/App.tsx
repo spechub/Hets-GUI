@@ -3,12 +3,10 @@ import * as React from "react";
 import { Grid, Container } from "semantic-ui-react";
 
 import { OpenUrl } from "../components/OpenUrl";
-// import { FDGraph } from "./components/FDGraph";
 import { OpenFile } from "../components/OpenFile";
-import { FillScreen } from "../components/FillScreen";
-import VisibleDagGraph from "../containers/VisibleDagGraph";
 import VisibleInformationSidebar from "../containers/VisibleInformationSidebar";
 import DataReceiverContainer from "../containers/DataReceiver";
+import GraphRendererContainer from "../containers/GraphRenderer";
 
 export default class App extends React.Component {
   render() {
@@ -32,17 +30,7 @@ export default class App extends React.Component {
                 </Grid>
               </Grid.Column>
               <Grid.Column>
-                <FillScreen
-                  children={props => <VisibleDagGraph {...props} />}
-                />
-                {/* <FDGraph
-            width={(
-              remote.getCurrentWindow().getContentSize()[0] - 16
-            ).toString()}
-            height={(
-              remote.getCurrentWindow().getContentSize()[1] - 150
-            ).toString()}
-          /> */}
+                <GraphRendererContainer />
               </Grid.Column>
             </Grid.Column>
           </Grid>
