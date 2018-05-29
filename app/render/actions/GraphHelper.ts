@@ -1,10 +1,40 @@
 import * as dagreD3 from "dagre-d3";
+import * as d3 from "d3";
+import { DGNode, DGLink } from "../../shared/DGraph";
+
+const edgeStyle = (e: DGLink) => {
+  return e.Type.includes("Unproven")
+    ? "stroke: #f66; fill: none;"
+    : e.Type.includes("Proven")
+      ? "stroke: #b8db95; fill: none;"
+      : "stroke: #999; fill: none;";
+};
+
+const arrowheadStyle = (e: DGLink) => {
+  return e.Type.includes("Unproven")
+    ? "stroke: #f66; fill: #f66;"
+    : e.Type.includes("Proven")
+      ? "stroke: #b8db95; fill: #b8db95;"
+      : "stroke: #999; fill: #999;";
+};
+
+const nodeStyle = (n: DGNode) => {
+  return {
+    style: n.reference
+      ? "fill: #e0de6d; stroke: black; stroke-width: 1px;"
+      : "fill: white; stroke: black; stroke-width: 1px;",
+    shape: n.reference ? "rect" : "ellipse"
+  };
+};
 
 // TODO: optimize
 // maybe pre filter *proven edges
 export function removeInternalEdges(
-  graph: dagreD3.graphlib.Graph
+  nodes: DGNode[],
+  edges: DGLink[]
 ): dagreD3.graphlib.Graph {
+  const graph = constructGraph(nodes, edges);
+
   for (const n of graph.nodes()) {
     if (!graph.node(n).internal) {
       continue;
@@ -25,13 +55,55 @@ export function removeInternalEdges(
         outEdges.forEach(eOut => {
           graph.removeEdge(eOut.v, eOut.w); // alle ausgehenden Kanten löschen
           if (eIn.v !== eOut.w) {
-            graph.setEdge(eIn.v, eOut.w); // neue Kante von source eingehender zu target ausgehender
+            graph.setEdge(eIn.v, eOut.w, {
+              curve: d3.curveBasis,
+              style: "stroke: #999; fill: none;",
+              arrowheadStyle: "stroke: #999; fill: #999;"
+            }); // neue Kante von source eingehender zu target ausgehender
           }
         });
       });
     }
     graph.removeNode(n);
   }
+
+  return graph;
+}
+
+export function constructGraph(
+  nodes: DGNode[],
+  edges: DGLink[]
+): dagreD3.graphlib.Graph {
+  const graph = new dagreD3.graphlib.Graph()
+    .setGraph({
+      // ranker: "longest-path"
+    })
+    .setDefaultEdgeLabel(() => {
+      return {};
+    });
+
+  nodes.forEach(n => {
+    graph.setNode(n.id.toString(), {
+      label: n.name,
+      axioms: n.Axioms,
+      declarations: n.Declarations,
+      theorems: n.Theorems,
+      logic: n.logic,
+      internal: n.internal,
+      reference: n.reference,
+      Reference: n.Reference,
+      ...nodeStyle(n)
+    });
+  });
+
+  edges.forEach(e => {
+    graph.setEdge(e.id_source.toString(), e.id_target.toString(), {
+      label: e.name ? e.name : "",
+      curve: d3.curveBasis,
+      style: edgeStyle(e),
+      arrowheadStyle: arrowheadStyle(e)
+    });
+  });
 
   return graph;
 }

@@ -7,9 +7,15 @@ import { IPCComm } from "../actions/IPCComm";
 import { QUERY_CHANNEL_RESPONSE } from "../../shared/SharedConstants";
 import { DGraphParser } from "../actions/DGraphParser";
 import { changeGraphAction } from "../actions/HetsGuiActions";
+import { constructGraph } from "../actions/GraphHelper";
+import { DGNode, DGLink } from "../../shared/DGraph";
 
 type DataReceiverProps = {
-  onGraphLoaded: (graph: dagreD3.graphlib.Graph) => void;
+  onGraphLoaded: (
+    graph: dagreD3.graphlib.Graph,
+    nodes: DGNode[],
+    edges: DGLink[]
+  ) => void;
 };
 
 class DataReceiver extends React.Component<DataReceiverProps, {}> {
@@ -24,52 +30,9 @@ class DataReceiver extends React.Component<DataReceiverProps, {}> {
 
   private queryResponse(_e: any, s: any) {
     const g = new DGraphParser(s);
-    const graph = this.constructGraph(g);
+    const graph = constructGraph(g.dgraph.DGNodes, g.dgraph.DGLinks);
 
-    this.props.onGraphLoaded(graph);
-  }
-
-  private constructGraph(g: DGraphParser): dagreD3.graphlib.Graph {
-    const nodes = g.dgraph.DGNodes;
-    const edges = g.dgraph.DGLinks;
-
-    const graph = new dagreD3.graphlib.Graph()
-      .setGraph({})
-      .setDefaultEdgeLabel(() => {
-        return {};
-      });
-
-    nodes.forEach(n => {
-      graph.setNode(n.id.toString(), {
-        label: n.name,
-        axioms: n.Axioms,
-        declarations: n.Declarations,
-        theorems: n.Theorems,
-        logic: n.logic,
-        internal: n.internal,
-        reference: n.reference,
-        Reference: n.Reference,
-        style: n.reference ? "fill: #e0de6d" : ""
-      });
-    });
-
-    edges.forEach(e => {
-      graph.setEdge(e.id_source.toString(), e.id_target.toString(), {
-        label: e.name ? e.name : e.Type,
-        style: e.Type.includes("Unproven")
-          ? "stroke: #f66; fill: none;"
-          : e.Type.includes("Proven")
-            ? "stroke: #b8db95; fill: none;"
-            : "",
-        arrowheadStyle: e.Type.includes("Unproven")
-          ? "stroke: #f66; fill: #f66;"
-          : e.Type.includes("Proven")
-            ? "stroke: #b8db95; fill: #b8db95;"
-            : ""
-      });
-    });
-
-    return graph;
+    this.props.onGraphLoaded(graph, g.dgraph.DGNodes, g.dgraph.DGLinks);
   }
 
   render() {
@@ -83,8 +46,12 @@ const mapStateToProps = () => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    onGraphLoaded: (graph: dagreD3.graphlib.Graph) => {
-      dispatch(changeGraphAction(graph));
+    onGraphLoaded: (
+      graph: dagreD3.graphlib.Graph,
+      nodes: DGNode[],
+      edges: DGLink[]
+    ) => {
+      dispatch(changeGraphAction(graph, nodes, edges));
     }
   };
 };

@@ -1,8 +1,12 @@
 import * as React from "react";
 import * as dagreD3 from "dagre-d3";
+import { Button } from "semantic-ui-react";
 
 export interface InformationSidebarProps {
   node: dagreD3.Node;
+  hidden: boolean;
+  onHideInternal: () => void;
+  onShowInternal: () => void;
 }
 
 export class InformationSidebar extends React.Component<
@@ -16,6 +20,23 @@ export class InformationSidebar extends React.Component<
   render() {
     return (
       <>
+        {this.props.hidden ? (
+          <Button
+            onClick={() => {
+              this.props.onShowInternal();
+            }}
+          >
+            Show internal
+          </Button>
+        ) : (
+          <Button
+            onClick={() => {
+              this.props.onHideInternal();
+            }}
+          >
+            Hide internal
+          </Button>
+        )}
         {this.props.node ? (
           <>
             <h3>{this.props.node.label}</h3>

@@ -16,7 +16,7 @@ const mapStateToProps = (
   ownProps: VisibleDagGraphProps
 ) => {
   return {
-    graph: state.graph,
+    graph: state.graph.dgraph,
     ...ownProps
   };
 };

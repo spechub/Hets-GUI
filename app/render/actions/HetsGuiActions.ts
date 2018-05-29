@@ -2,9 +2,14 @@ import { Action } from "redux";
 import * as dagreD3 from "dagre-d3";
 
 import { GraphRenderer } from "../reducers/reducer";
+import { DGNode, DGLink } from "../../shared/DGraph";
 
 export interface HetsGuiActions extends Action {
-  graph?: dagreD3.graphlib.Graph;
+  graph?: {
+    dgraph: dagreD3.graphlib.Graph;
+    nodes: DGNode[];
+    edges: DGLink[];
+  };
   node?: dagreD3.Node;
   renderer?: GraphRenderer;
   size?: { width: number; height: number };
@@ -12,9 +17,14 @@ export interface HetsGuiActions extends Action {
 
 export const SET_GRAPH = "SET_GRAPH";
 export function changeGraphAction(
-  graph: dagreD3.graphlib.Graph
+  graph: dagreD3.graphlib.Graph,
+  nodes: DGNode[],
+  edges: DGLink[]
 ): HetsGuiActions {
-  return { type: SET_GRAPH, graph: graph };
+  return {
+    type: SET_GRAPH,
+    graph: { dgraph: graph, edges: edges, nodes: nodes }
+  };
 }
 
 export const SELECT_NODE = "SELECT_NODE";
@@ -38,4 +48,9 @@ export function setSizeAction(size: {
 export const HIDE_INTERNAL = "HIDE_INTERNAL";
 export function hideInternalAction() {
   return { type: HIDE_INTERNAL };
+}
+
+export const SHOW_INTERNAL = "SHOW_INTERNAL";
+export function showInternalAction() {
+  return { type: SHOW_INTERNAL };
 }

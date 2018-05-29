@@ -6,9 +6,11 @@ import {
   SET_GRAPH,
   SET_RENDERER,
   SET_SIZE,
-  HIDE_INTERNAL
+  HIDE_INTERNAL,
+  SHOW_INTERNAL
 } from "../actions/HetsGuiActions";
-import { removeInternalEdges } from "../actions/GraphHelper";
+import { removeInternalEdges, constructGraph } from "../actions/GraphHelper";
+import { DGNode, DGLink } from "../../shared/DGraph";
 
 export enum GraphRenderer {
   FORCE_DIRCETED,
@@ -16,17 +18,27 @@ export enum GraphRenderer {
 }
 
 export type HetsGuiState = {
-  graph: dagreD3.graphlib.Graph;
+  graph: {
+    dgraph: dagreD3.graphlib.Graph;
+    nodes: DGNode[];
+    edges: DGLink[];
+  };
   selectedNode: dagreD3.Node;
   openRenderer: GraphRenderer;
   svgSize: { width: number; height: number };
+  internalHidden: boolean;
 };
 
 const initialState: HetsGuiState = {
-  graph: null,
+  graph: {
+    dgraph: null,
+    nodes: [],
+    edges: []
+  },
   selectedNode: null,
   openRenderer: GraphRenderer.GRAPHVIZ,
-  svgSize: { width: 0, height: 0 }
+  svgSize: { width: 0, height: 0 },
+  internalHidden: false
 };
 
 export function hetsGui(
@@ -52,7 +64,21 @@ export function hetsGui(
       });
     case HIDE_INTERNAL:
       return Object.assign({}, state, {
-        graph: removeInternalEdges(state.graph)
+        graph: {
+          dgraph: removeInternalEdges(state.graph.nodes, state.graph.edges),
+          nodes: state.graph.nodes,
+          edges: state.graph.edges
+        },
+        internalHidden: true
+      });
+    case SHOW_INTERNAL:
+      return Object.assign({}, state, {
+        graph: {
+          dgraph: constructGraph(state.graph.nodes, state.graph.edges),
+          nodes: state.graph.nodes,
+          edges: state.graph.edges
+        },
+        internalHidden: false
       });
     default:
       return state;
