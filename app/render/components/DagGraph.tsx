@@ -53,10 +53,18 @@ export class DagGraph extends Component<DagGraphProps, {}> {
 
     g.selectAll("g.node").on("click", (v: string) => {
       this.props.onSelectNode(graph.node(v));
+      d3.event.stopPropagation();
     });
 
     g.selectAll("g.edgePath").on("click", (e: { v: string; w: string }) => {
       this.props.onSelectEdge(graph.edge(e));
+      d3.event.stopPropagation();
+    });
+
+    svg.on("click", () => {
+      this.props.onSelectEdge(null);
+      this.props.onSelectNode(null);
+      d3.event.stopPropagation();
     });
 
     svg.call(

@@ -7,7 +7,8 @@ import {
   Axiom,
   Declaration,
   Theorem,
-  Reference
+  Reference,
+  SenSymbol
 } from "../../shared/DGraph";
 
 interface Serializable<T> {
@@ -55,6 +56,56 @@ class ReferenceImpl implements Reference, Serializable<Reference> {
   }
 }
 
+class AxiomImpl implements Axiom, Serializable<Axiom> {
+  Axiom: string;
+  SenSymbols: SenSymbol[];
+  name: string;
+  range: string;
+
+  deserialize(input: any): Axiom {
+    this.Axiom = input["Axiom"];
+    this.name = input["name"];
+    this.range = input["range"];
+
+    return this;
+  }
+}
+
+class DeclarationImpl implements Declaration, Serializable<Declaration> {
+  Symbol: string;
+  iri: string;
+  kind: string;
+  name: string;
+  range: string;
+
+  deserialize(input: any): Declaration {
+    this.Symbol = input["Symbol"];
+    this.iri = input["iri"];
+    this.kind = input["kind"];
+    this.name = input["name"];
+    this.range = input["range"];
+
+    return this;
+  }
+}
+
+class TheoremImpl implements Theorem, Serializable<Theorem> {
+  SenSymbols: SenSymbol[];
+  Theorem: string;
+  name: string;
+  range: string;
+  status: string;
+
+  deserialize(input: any): Theorem {
+    this.Theorem = input["Theorem"];
+    this.name = input["name"];
+    this.range = input["range"];
+    this.status = input["status"];
+
+    return this;
+  }
+}
+
 class DGNodeImpl implements DGNode, Serializable<DGNode> {
   Axioms: Axiom[];
   Declarations: Declaration[];
@@ -82,6 +133,27 @@ class DGNodeImpl implements DGNode, Serializable<DGNode> {
     this.Reference = null;
     if (input["Reference"]) {
       this.Reference = new ReferenceImpl().deserialize(input["Reference"]);
+    }
+
+    this.Axioms = [];
+    if (input["Axioms"]) {
+      input["Axioms"].forEach((axiom: any) => {
+        this.Axioms.push(new AxiomImpl().deserialize(axiom));
+      });
+    }
+
+    this.Declarations = [];
+    if (input["Declarations"]) {
+      input["Declarations"].forEach((decl: any) => {
+        this.Declarations.push(new DeclarationImpl().deserialize(decl));
+      });
+    }
+
+    this.Theorems = [];
+    if (input["Theorems"]) {
+      input["Theorems"].forEach((theo: any) => {
+        this.Theorems.push(new TheoremImpl().deserialize(theo));
+      });
     }
 
     return this;

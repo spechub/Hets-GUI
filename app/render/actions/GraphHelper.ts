@@ -4,25 +4,30 @@ import { DGNode, DGLink } from "../../shared/DGraph";
 
 const edgeStyle = (e: DGLink) => {
   return e.Type.includes("Unproven")
-    ? "stroke: #f66; fill: none;"
+    ? "stroke: #e5647a; fill: none;"
     : e.Type.includes("Proven")
       ? "stroke: #b8db95; fill: none;"
-      : "stroke: #999; fill: none;";
+      : e.Type.includes("Hiding")
+        ? "stroke: #6babef; fill: none;"
+        : "stroke: #999; fill: none;";
 };
 
 const arrowheadStyle = (e: DGLink) => {
   return e.Type.includes("Unproven")
-    ? "stroke: #f66; fill: #f66;"
+    ? "stroke: #e5647a; fill: #e5647a;"
     : e.Type.includes("Proven")
       ? "stroke: #b8db95; fill: #b8db95;"
-      : "stroke: #999; fill: #999;";
+      : e.Type.includes("Hiding")
+        ? "stroke: #6babef; fill: #6babef;"
+        : "stroke: #999; fill: #999;";
 };
 
 const nodeStyle = (n: DGNode) => {
   return {
-    style: n.reference
-      ? "fill: #e0de6d; stroke: black; stroke-width: 1px;"
-      : "fill: white; stroke: black; stroke-width: 1px;",
+    style:
+      n.Theorems.length > 0
+        ? "fill: #e5647a; stroke: #999; stroke-width: 1px;"
+        : "fill: #b8db95; stroke: #999; stroke-width: 1px;",
     shape: n.reference ? "rect" : "ellipse"
   };
 };

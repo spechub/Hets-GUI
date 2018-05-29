@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as dagreD3 from "dagre-d3";
 import { Button } from "semantic-ui-react";
+import { Theorem, Declaration } from "../../shared/DGraph";
 
 export interface InformationSidebarProps {
   node: dagreD3.Node;
@@ -47,8 +48,20 @@ export class InformationSidebar extends React.Component<
                 ? this.props.node.Reference.library
                 : ""}
             </p>
-            <p>{this.props.node.declarations}</p>
-            <p>{this.props.node.theorems}</p>
+            <p>Declarations</p>
+            <ul>
+              {this.props.node.declarations.map(
+                (decl: Declaration, i: number) => {
+                  return <li key={i}>{decl.name}</li>;
+                }
+              )}
+            </ul>
+            <p>Theorems</p>
+            <ul>
+              {this.props.node.theorems.map((theo: Theorem, i: number) => {
+                return <li key={i}>{theo.name}</li>;
+              })}
+            </ul>
           </>
         ) : (
           ""
