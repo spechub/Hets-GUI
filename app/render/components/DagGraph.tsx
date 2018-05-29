@@ -8,6 +8,7 @@ export type DagGraphProps = {
   height: number;
   graph: dagreD3.graphlib.Graph;
   onSelectNode: (node: dagreD3.Node) => void;
+  onSelectEdge: (edge: dagreD3.GraphEdge) => void;
 };
 
 export class DagGraph extends Component<DagGraphProps, {}> {
@@ -52,6 +53,10 @@ export class DagGraph extends Component<DagGraphProps, {}> {
 
     g.selectAll("g.node").on("click", (v: string) => {
       this.props.onSelectNode(graph.node(v));
+    });
+
+    g.selectAll("g.edgePath").on("click", (e: { v: string; w: string }) => {
+      this.props.onSelectEdge(graph.edge(e));
     });
 
     svg.call(

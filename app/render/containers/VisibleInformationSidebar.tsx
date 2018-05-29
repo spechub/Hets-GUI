@@ -10,6 +10,7 @@ import {
 const mapStateToProps = (state: HetsGuiState) => {
   return {
     node: state.selectedNode,
+    edge: state.selectedEdge,
     hidden: state.internalHidden
   };
 };

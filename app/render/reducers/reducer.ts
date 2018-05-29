@@ -7,7 +7,8 @@ import {
   SET_RENDERER,
   SET_SIZE,
   HIDE_INTERNAL,
-  SHOW_INTERNAL
+  SHOW_INTERNAL,
+  SELECT_EDGE
 } from "../actions/HetsGuiActions";
 import { removeInternalEdges, constructGraph } from "../actions/GraphHelper";
 import { DGNode, DGLink } from "../../shared/DGraph";
@@ -24,6 +25,7 @@ export type HetsGuiState = {
     edges: DGLink[];
   };
   selectedNode: dagreD3.Node;
+  selectedEdge: dagreD3.GraphEdge;
   openRenderer: GraphRenderer;
   svgSize: { width: number; height: number };
   internalHidden: boolean;
@@ -36,6 +38,7 @@ const initialState: HetsGuiState = {
     edges: []
   },
   selectedNode: null,
+  selectedEdge: null,
   openRenderer: GraphRenderer.GRAPHVIZ,
   svgSize: { width: 0, height: 0 },
   internalHidden: false
@@ -49,6 +52,10 @@ export function hetsGui(
     case SELECT_NODE:
       return Object.assign({}, state, {
         selectedNode: action.node
+      });
+    case SELECT_EDGE:
+      return Object.assign({}, state, {
+        selectedEdge: action.edge
       });
     case SET_GRAPH:
       return Object.assign({}, state, {

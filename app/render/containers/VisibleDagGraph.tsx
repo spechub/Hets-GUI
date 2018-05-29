@@ -3,7 +3,7 @@ import { Dispatch } from "redux";
 import * as dagreD3 from "dagre-d3";
 
 import { DagGraph } from "../components/DagGraph";
-import { selectNodeAction } from "../actions/HetsGuiActions";
+import { selectNodeAction, selectEdgeAction } from "../actions/HetsGuiActions";
 import { HetsGuiState } from "../reducers/reducer";
 
 type VisibleDagGraphProps = {
@@ -25,6 +25,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
     onSelectNode: (node: dagreD3.Node) => {
       dispatch(selectNodeAction(node));
+    },
+    onSelectEdge: (edge: dagreD3.GraphEdge) => {
+      dispatch(selectEdgeAction(edge));
     }
   };
 };

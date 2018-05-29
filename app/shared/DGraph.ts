@@ -19,6 +19,7 @@ export interface DGLink {
   source: string;
   target: string;
   name?: string;
+  Rule?: string;
 }
 
 export interface Reference {

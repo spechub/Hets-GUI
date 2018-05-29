@@ -4,6 +4,7 @@ import { Button } from "semantic-ui-react";
 
 export interface InformationSidebarProps {
   node: dagreD3.Node;
+  edge: dagreD3.GraphEdge;
   hidden: boolean;
   onHideInternal: () => void;
   onShowInternal: () => void;
@@ -39,7 +40,7 @@ export class InformationSidebar extends React.Component<
         )}
         {this.props.node ? (
           <>
-            <h3>{this.props.node.label}</h3>
+            <p>{this.props.node.label}</p>
             <p>{this.props.node.logic}</p>
             <p>
               {this.props.node.Reference
@@ -51,6 +52,16 @@ export class InformationSidebar extends React.Component<
           </>
         ) : (
           <h3>no node selected :(</h3>
+        )}
+        {this.props.edge ? (
+          <>
+            <p>{this.props.edge.label}</p>
+            <p>{this.props.edge.Type}</p>
+            <p>{this.props.edge.ConsStatus} </p>
+            <p>{this.props.edge.Rule}</p>
+          </>
+        ) : (
+          <h3>no edge selected :(</h3>
         )}
       </>
     );

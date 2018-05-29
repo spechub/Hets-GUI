@@ -101,7 +101,10 @@ export function constructGraph(
       label: e.name ? e.name : "",
       curve: d3.curveBasis,
       style: edgeStyle(e),
-      arrowheadStyle: arrowheadStyle(e)
+      arrowheadStyle: arrowheadStyle(e),
+      ConsStatus: e.ConsStatus,
+      Rule: e.Rule,
+      Type: e.Type
     });
   });
 
