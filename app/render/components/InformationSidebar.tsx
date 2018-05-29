@@ -51,7 +51,7 @@ export class InformationSidebar extends React.Component<
             <p>{this.props.node.theorems}</p>
           </>
         ) : (
-          <h3>no node selected :(</h3>
+          ""
         )}
         {this.props.edge ? (
           <>
@@ -61,7 +61,7 @@ export class InformationSidebar extends React.Component<
             <p>{this.props.edge.Rule}</p>
           </>
         ) : (
-          <h3>no edge selected :(</h3>
+          ""
         )}
       </>
     );
