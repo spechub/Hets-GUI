@@ -1,7 +1,8 @@
 import * as React from "react";
 import * as dagreD3 from "dagre-d3";
 import { Button } from "semantic-ui-react";
-import { Theorem, Declaration } from "../../shared/DGraph";
+import { Accordion } from "semantic-ui-react";
+import { Theorem, Declaration, SenSymbol } from "../../shared/DGraph";
 import { EGraphRenderer } from "../reducers/reducer";
 
 export interface InformationSidebarProps {
@@ -18,11 +19,76 @@ export class InformationSidebar extends React.Component<
   InformationSidebarProps,
   {}
 > {
+  rootPanels: any;
+
   constructor(props: InformationSidebarProps) {
     super(props);
   }
 
   render() {
+    if (this.props.node) {
+      let groupByKind: any = {};
+
+      this.props.node.declarations.forEach((decl: Declaration) => {
+        if (!groupByKind[decl.kind]) {
+          groupByKind[decl.kind] = [];
+        }
+        groupByKind[decl.kind].push(decl.Symbol);
+      });
+
+      const declContent = Object.keys(groupByKind).map((key: string) => {
+        return {
+          title: key,
+          content: groupByKind[key].map((op: string, i: number) => {
+            return (
+              <p key={i} className="text-mono">
+                {op}
+              </p>
+            );
+          })
+        };
+      });
+
+      const theoContent = this.props.node.theorems.map((theo: Theorem) => {
+        return {
+          title: theo.name,
+          content: theo.SenSymbols.map((sym: SenSymbol, i: number) => {
+            return (
+              <p key={i} className="text-mono">
+                {sym.Symbol}
+              </p>
+            );
+          })
+        };
+      });
+
+      const DeclAccordion = (
+        <>
+          <Accordion.Accordion panels={declContent} exclusive={false} />
+        </>
+      );
+
+      const TheoAccordion = (
+        <>
+          <Accordion.Accordion panels={theoContent} exclusive={false} />
+        </>
+      );
+
+      this.rootPanels = [];
+      if (this.props.node.theorems.length > 0) {
+        this.rootPanels.push({
+          title: "Theorems",
+          content: { content: TheoAccordion, key: "content-1" }
+        });
+      }
+      if (this.props.node.declarations.length > 0) {
+        this.rootPanels.push({
+          title: "Declarations",
+          content: { content: DeclAccordion, key: "content-2" }
+        });
+      }
+    }
+
     return (
       <>
         <p>
@@ -73,20 +139,7 @@ export class InformationSidebar extends React.Component<
                 ? "Referenced from: " + this.props.node.Reference.library
                 : ""}
             </p>
-            <p>Declarations</p>
-            <ul>
-              {this.props.node.declarations.map(
-                (decl: Declaration, i: number) => {
-                  return <li key={i}>{decl.name}</li>;
-                }
-              )}
-            </ul>
-            <p>Theorems</p>
-            <ul>
-              {this.props.node.theorems.map((theo: Theorem, i: number) => {
-                return <li key={i}>{theo.name}</li>;
-              })}
-            </ul>
+            <Accordion panels={this.rootPanels} />
           </>
         ) : (
           ""

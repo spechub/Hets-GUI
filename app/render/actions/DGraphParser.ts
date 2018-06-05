@@ -56,6 +56,24 @@ class ReferenceImpl implements Reference, Serializable<Reference> {
   }
 }
 
+class SenSymbolImpl implements SenSymbol, Serializable<SenSymbol> {
+  Symbol: string;
+  iri: string;
+  kind: string;
+  name: string;
+  range: string;
+
+  deserialize(input: any): SenSymbol {
+    this.Symbol = input["Symbol"];
+    this.iri = input["iri"];
+    this.kind = input["kind"];
+    this.name = input["name"];
+    this.range = input["range"];
+
+    return this;
+  }
+}
+
 class AxiomImpl implements Axiom, Serializable<Axiom> {
   Axiom: string;
   SenSymbols: SenSymbol[];
@@ -101,6 +119,13 @@ class TheoremImpl implements Theorem, Serializable<Theorem> {
     this.name = input["name"];
     this.range = input["range"];
     this.status = input["status"];
+
+    this.SenSymbols = [];
+    if (input["SenSymbols"]) {
+      input["SenSymbols"].forEach((symbol: any) => {
+        this.SenSymbols.push(new SenSymbolImpl().deserialize(symbol));
+      });
+    }
 
     return this;
   }
