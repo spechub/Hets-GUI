@@ -12,11 +12,6 @@ export interface FDGraphProps {
   edges: DGLink[];
 }
 
-interface FDGraphState {
-  width: number;
-  height: number;
-}
-
 interface InternalNode {
   id: number;
   name: string;
@@ -33,7 +28,7 @@ interface InternalLink {
   loops: boolean;
 }
 
-export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
+export class FDGraph extends React.Component<FDGraphProps> {
   svg: d3.Selection<HTMLElement, any, HTMLElement, any>;
   simulation: d3.Simulation<any, any>;
   base: d3.Selection<Element, any, HTMLElement, any>;
@@ -66,10 +61,7 @@ export class FDGraph extends React.Component<FDGraphProps, FDGraphState> {
   render() {
     return (
       <>
-        <svg
-          width={this.state ? this.state.width : this.props.width}
-          height={this.state ? this.state.height : this.props.height}
-        />
+        <svg width={this.props.width} height={this.props.height} />
         <GraphControls
           edgeStrengthsChanged={this.inputted.bind(this)}
           showInternalEdges={this.showInternalEdges.bind(this)}

@@ -25,47 +25,52 @@ export class InformationSidebar extends React.Component<
   render() {
     return (
       <>
-        {this.props.hidden ? (
-          <Button
-            onClick={() => {
-              this.props.onShowInternal();
-            }}
-          >
-            Show internal
-          </Button>
-        ) : (
-          <Button
-            onClick={() => {
-              this.props.onHideInternal();
-            }}
-          >
-            Hide internal
-          </Button>
-        )}
-        {this.props.renderer === EGraphRenderer.GRAPHVIZ ? (
-          <Button
-            onClick={() => {
-              this.props.onSwitchRenderer(EGraphRenderer.FORCE_DIRCETED);
-            }}
-          >
-            switch renderer
-          </Button>
-        ) : (
-          <Button
-            onClick={() => {
-              this.props.onSwitchRenderer(EGraphRenderer.GRAPHVIZ);
-            }}
-          >
-            switch renderer
-          </Button>
-        )}
+        <p>
+          {this.props.hidden ? (
+            <Button
+              onClick={() => {
+                this.props.onShowInternal();
+              }}
+            >
+              Show intermediate Nodes
+            </Button>
+          ) : (
+            <Button
+              onClick={() => {
+                this.props.onHideInternal();
+              }}
+            >
+              Hide intermediate Nodes
+            </Button>
+          )}
+        </p>
+        <p>
+          {this.props.renderer === EGraphRenderer.GRAPHVIZ ? (
+            <Button
+              onClick={() => {
+                this.props.onSwitchRenderer(EGraphRenderer.FORCE_DIRCETED);
+              }}
+            >
+              switch to FD layout
+            </Button>
+          ) : (
+            <Button
+              onClick={() => {
+                this.props.onSwitchRenderer(EGraphRenderer.GRAPHVIZ);
+              }}
+            >
+              switch to graphviz layout
+            </Button>
+          )}
+        </p>
         {this.props.node ? (
           <>
-            <p>{this.props.node.label}</p>
-            <p>{this.props.node.logic}</p>
+            <b>Node</b>
+            <p>{"Name: " + this.props.node.label}</p>
+            <p>{"Logic: " + this.props.node.logic}</p>
             <p>
               {this.props.node.Reference
-                ? this.props.node.Reference.library
+                ? "Referenced from: " + this.props.node.Reference.library
                 : ""}
             </p>
             <p>Declarations</p>
@@ -88,10 +93,15 @@ export class InformationSidebar extends React.Component<
         )}
         {this.props.edge ? (
           <>
+            <b>Edge</b>
             <p>{this.props.edge.label}</p>
-            <p>{this.props.edge.Type}</p>
-            <p>{this.props.edge.ConsStatus} </p>
-            <p>{this.props.edge.Rule}</p>
+            <p>{"Type: " + this.props.edge.Type}</p>
+            <p>
+              {this.props.edge.ConsStatus
+                ? "Cons status: " + this.props.edge.ConsStatus
+                : ""}
+            </p>
+            <p>{this.props.edge.Rule ? "Rule: " + this.props.edge.Rule : ""}</p>
           </>
         ) : (
           ""

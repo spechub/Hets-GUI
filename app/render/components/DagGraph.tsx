@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Component } from "react";
 import * as d3 from "d3";
 import * as dagreD3 from "dagre-d3";
 
@@ -11,7 +10,7 @@ export type DagGraphProps = {
   onSelectEdge: (edge: dagreD3.GraphEdge) => void;
 };
 
-export class DagGraph extends Component<DagGraphProps, {}> {
+export class DagGraph extends React.Component<DagGraphProps, {}> {
   baseSvg: SVGSVGElement;
   scale: { k: number; x: number; y: number };
 
