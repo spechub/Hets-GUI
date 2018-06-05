@@ -26,8 +26,8 @@ const nodeStyle = (n: DGNode) => {
   return {
     style:
       n.Theorems.length > 0
-        ? "fill: #e5647a; stroke: #999; stroke-width: 1px;"
-        : "fill: #b8db95; stroke: #999; stroke-width: 1px;",
+        ? "fill: white; stroke: #e5647a; stroke-width: 3.5px;"
+        : "fill: white; stroke: #b8db95; stroke-width: 3.5px;",
     shape: n.reference ? "rect" : "ellipse"
   };
 };
