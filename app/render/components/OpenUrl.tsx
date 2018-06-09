@@ -24,6 +24,8 @@ export class OpenUrl extends React.Component<OpenUrlProps, OpenUrlState> {
     IPCComm.recieveMessage(QUERY_CHANNEL_RESPONSE, () => {
       this.setState({ loading: false });
     });
+
+    this.handleKey = this.handleKey.bind(this);
   }
 
   render() {
@@ -35,6 +37,7 @@ export class OpenUrl extends React.Component<OpenUrlProps, OpenUrlState> {
         fluid={true}
         placeholder="Url or Path ..."
         action={true}
+        onKeyPress={this.handleKey}
       >
         <input />
         <Button
@@ -53,6 +56,14 @@ export class OpenUrl extends React.Component<OpenUrlProps, OpenUrlState> {
         </Button>
       </Input>
     );
+  }
+
+  private handleKey(evt: React.KeyboardEvent<KeyboardEvent>) {
+    if (evt.key !== "Enter") {
+      return;
+    }
+
+    this.openFile();
   }
 
   private updateFilePath(
