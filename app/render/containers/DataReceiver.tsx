@@ -30,8 +30,11 @@ class DataReceiver extends React.Component<DataReceiverProps, {}> {
 
   private queryResponse(_e: any, s: any) {
     const g = new DGraphParser(s);
-    const graph = constructGraph(g.dgraph.DGNodes, g.dgraph.DGLinks);
+    if (!g.dgraph) {
+      return;
+    }
 
+    const graph = constructGraph(g.dgraph.DGNodes, g.dgraph.DGLinks);
     this.props.onGraphLoaded(graph, g.dgraph.DGNodes, g.dgraph.DGLinks);
   }
 
@@ -56,8 +59,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
   };
 };
 
-const DataReceiverContainer = connect(mapStateToProps, mapDispatchToProps)(
-  DataReceiver
-);
+const DataReceiverContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DataReceiver);
 
 export default DataReceiverContainer;

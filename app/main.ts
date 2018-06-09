@@ -74,6 +74,7 @@ ipcMain.on(QUERY_CHANNEL, (event: Event, message: any) => {
     .catch((err: Error) => {
       console.error(err.message);
       dialog.showErrorBox("Network Error", err.message);
+      event.sender.send(QUERY_CHANNEL_RESPONSE, "");
     })
     .then((res: JSON) => {
       event.sender.send(QUERY_CHANNEL_RESPONSE, res);

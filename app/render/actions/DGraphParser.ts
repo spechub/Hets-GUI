@@ -247,6 +247,10 @@ export class DGraphParser {
   }
 
   private parse(dgraph: any) {
+    if (!dgraph || dgraph === "") {
+      this.dgraph = null;
+      return;
+    }
     this.dgraph = new DGraphImpl().deserialize(dgraph["DGraph"]);
   }
 }
