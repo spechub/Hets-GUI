@@ -23,7 +23,6 @@ export class Utils {
     let hetsApiOptions: HETSApiOptions;
     if (type === URLType.File) {
       escapedURL = querystring.escape("file:///" + filepath);
-      console.log(escapedURL);
       hetsApiOptions = {
         hostname: hostname,
         port: port,
@@ -44,7 +43,7 @@ export class Utils {
     try {
       return await this.getJSON(hetsApiOptions);
     } catch (err) {
-      throw new Error(err);
+      throw err;
     }
   }
 
@@ -88,7 +87,7 @@ export class Utils {
 
           let error: Error;
           if (statusCode !== 200) {
-            error = new Error(`Request Failed. Status Code: ${statusCode}`);
+            error = new Error(statusCode.toString());
           } else if (!/^application\/json/.test(contentType)) {
             error = new Error(
               `Invalid content-type. Expected application/json but received ${contentType}`

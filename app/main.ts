@@ -72,8 +72,18 @@ ipcMain.on(QUERY_CHANNEL, (event: Event, message: any) => {
     message.command_list
   )
     .catch((err: Error) => {
-      console.error(err.message);
-      dialog.showErrorBox("Network Error", err.message);
+      console.error(err);
+      if (err.message === "422") {
+        dialog.showErrorBox(
+          "Could not open file!",
+          `Hets returned with error code: ${err.message}.`
+        );
+      } else {
+        dialog.showErrorBox(
+          "Unknown error!",
+          `Hets returned with error code: ${err.message}.`
+        );
+      }
       event.sender.send(QUERY_CHANNEL_RESPONSE, "");
     })
     .then((res: JSON) => {
