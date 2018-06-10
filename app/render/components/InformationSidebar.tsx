@@ -41,9 +41,9 @@ export class InformationSidebar extends React.Component<
           title: key,
           content: groupByKind[key].map((op: string, i: number) => {
             return (
-              <p key={i} className="text-mono">
+              <div key={i} className="text-mono">
                 {op}
-              </p>
+              </div>
             );
           })
         };
@@ -54,9 +54,9 @@ export class InformationSidebar extends React.Component<
           title: theo.name,
           content: theo.SenSymbols.map((sym: SenSymbol, i: number) => {
             return (
-              <p key={i} className="text-mono">
+              <div key={i} className="text-mono">
                 {sym.Symbol}
-              </p>
+              </div>
             );
           })
         };
