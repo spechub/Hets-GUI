@@ -36,42 +36,44 @@ export class InformationSidebar extends React.Component<
         groupByKind[decl.kind].push(decl.Symbol);
       });
 
-      const declContent = Object.keys(groupByKind).map((key: string) => {
-        return {
-          title: key,
-          content: groupByKind[key].map((op: string, i: number) => {
-            return (
-              <div key={i} className="text-mono">
-                {op}
-              </div>
-            );
-          })
-        };
-      });
+      const declContent = Object.keys(groupByKind).map(
+        (key: string, i: number) => {
+          return {
+            title: key,
+            key: "decl-" + i,
+            content: groupByKind[key].map((op: string, i: number) => {
+              return (
+                <div key={i} className="text-mono">
+                  {op}
+                </div>
+              );
+            })
+          };
+        }
+      );
 
-      const theoContent = this.props.node.theorems.map((theo: Theorem) => {
-        return {
-          title: theo.name,
-          content: theo.SenSymbols.map((sym: SenSymbol, i: number) => {
-            return (
-              <div key={i} className="text-mono">
-                {sym.Symbol}
-              </div>
-            );
-          })
-        };
-      });
+      const theoContent = this.props.node.theorems.map(
+        (theo: Theorem, i: number) => {
+          return {
+            title: theo.name,
+            key: "theo-" + i,
+            content: theo.SenSymbols.map((sym: SenSymbol, i: number) => {
+              return (
+                <div key={i} className="text-mono">
+                  {sym.Symbol}
+                </div>
+              );
+            })
+          };
+        }
+      );
 
       const DeclAccordion = (
-        <>
-          <Accordion.Accordion panels={declContent} exclusive={false} />
-        </>
+        <Accordion.Accordion panels={declContent} exclusive={false} />
       );
 
       const TheoAccordion = (
-        <>
-          <Accordion.Accordion panels={theoContent} exclusive={false} />
-        </>
+        <Accordion.Accordion panels={theoContent} exclusive={false} />
       );
 
       this.rootPanels = [];
