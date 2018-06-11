@@ -50,7 +50,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
   }
 
   componentDidMount() {
-    this.renderGraph();
+    this.prepareRender();
     this.prepareData(this.props.nodes, this.props.edges);
   }
 
@@ -71,7 +71,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
     );
   }
 
-  private renderGraph() {
+  private prepareRender() {
     this.svg = d3.select("svg");
     this.base = this.svg.append("g");
     const width = +this.svg.attr("width");
@@ -264,13 +264,6 @@ export class FDGraph extends React.Component<FDGraphProps> {
           .on("end", this.dragended.bind(this))
       );
 
-    this.node
-      .append("circle")
-      .attr("r", 5)
-      .attr("class", (n: any) => {
-        return n.internal ? "internal" : "";
-      });
-
     this.node.append("title").text((d: any) => {
       return d.name;
     });
@@ -285,6 +278,22 @@ export class FDGraph extends React.Component<FDGraphProps> {
       .attr("y", 4)
       .text((n: any) => {
         return n.name;
+      });
+
+    d3.selectAll(".nodes text").each((d: any, i: number, nodes: any[]) => {
+      d.bBox = nodes[i].getBBox();
+    });
+
+    this.node
+      .append("ellipse")
+      .attr("rx", (d: any) => {
+        return d.bBox ? d.bBox.width : 10;
+      })
+      .attr("ry", (d: any) => {
+        return d.bBox ? d.bBox.height : 5;
+      })
+      .attr("class", (n: any) => {
+        return n.internal ? "internal" : "";
       });
 
     this.simulation.alpha(1).restart();
@@ -316,8 +325,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
     const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
     const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
     return {
-      x: d.target.x - vec.x / len * 8,
-      y: d.target.y - vec.y / len * 8
+      x: d.target.x - (vec.x / len) * 8,
+      y: d.target.y - (vec.y / len) * 8
     };
   }
 
@@ -325,8 +334,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
     const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
     const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
     return {
-      x: d.source.x + -vec.y / len * 20 + vec.x * 0.5,
-      y: d.source.y + vec.x / len * 20 + vec.y * 0.5
+      x: d.source.x + (-vec.y / len) * 20 + vec.x * 0.5,
+      y: d.source.y + (vec.x / len) * 20 + vec.y * 0.5
     };
   }
 
@@ -334,8 +343,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
     const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
     const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
     return {
-      x: d.target.x + -vec.y / len * 7 - vec.x * 0.1,
-      y: d.target.y + vec.x / len * 7 - vec.y * 0.1
+      x: d.target.x + (-vec.y / len) * 7 - vec.x * 0.1,
+      y: d.target.y + (vec.x / len) * 7 - vec.y * 0.1
     };
   }
 
