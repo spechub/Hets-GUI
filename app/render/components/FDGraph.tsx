@@ -86,9 +86,9 @@ export class FDGraph extends React.Component<FDGraphProps> {
           .id((d: any) => {
             return d.id;
           })
-          .strength(0.5)
+          .distance(80)
       )
-      .force("charge", d3.forceManyBody())
+      .force("charge", d3.forceManyBody().strength(-120))
       .force("center", d3.forceCenter(width / 2, height / 2));
 
     this.zoom = d3
@@ -102,9 +102,9 @@ export class FDGraph extends React.Component<FDGraphProps> {
     this.svg.call(this.zoom);
   }
 
-  private inputted(_e: Event, d: any) {
-    (this.simulation.force("link") as any).strength(+d.value);
-    this.simulation.alpha(1).restart();
+  private inputted(_e: Event, _d: any) {
+    // (this.simulation.force("link") as any).strength(+d.value);
+    // this.simulation.alpha(1).restart();
   }
 
   private showInternalEdges() {
@@ -269,13 +269,14 @@ export class FDGraph extends React.Component<FDGraphProps> {
     });
 
     this.node
-      .filter((n: any) => {
-        return !n.internal;
+      .filter((d: any) => {
+        return !d.internal;
       })
       .append("text")
       .append("tspan")
-      .attr("x", 7)
-      .attr("y", 4)
+      .attr("x", 0)
+      .attr("y", 4.5)
+      .classed("center-text", true)
       .text((n: any) => {
         return n.name;
       });
@@ -286,14 +287,15 @@ export class FDGraph extends React.Component<FDGraphProps> {
 
     this.node
       .append("ellipse")
+      .lower()
       .attr("rx", (d: any) => {
-        return d.bBox ? d.bBox.width : 10;
+        return d.bBox ? d.bBox.width / 2 + 6 : 10;
       })
       .attr("ry", (d: any) => {
         return d.bBox ? d.bBox.height : 5;
       })
       .attr("class", (n: any) => {
-        return n.internal ? "internal" : "";
+        return n.internal ? "internal" : "fd-node";
       });
 
     this.simulation.alpha(1).restart();
