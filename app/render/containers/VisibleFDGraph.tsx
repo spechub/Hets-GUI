@@ -12,8 +12,7 @@ const mapStateToProps = (
   ownProps: VisibleFDGraphProps
 ) => {
   return {
-    nodes: state.graph.nodes,
-    edges: state.graph.edges,
+    graph: state.graph.dgraph,
     ...ownProps
   };
 };

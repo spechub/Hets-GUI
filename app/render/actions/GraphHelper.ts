@@ -1,8 +1,44 @@
 import * as dagreD3 from "dagre-d3";
 import * as d3 from "d3";
-import { DGNode, DGLink } from "../../shared/DGraph";
 
-const edgeStyle = (e: DGLink) => {
+import { Node, GraphEdge } from "dagre-d3";
+
+import {
+  DGNode,
+  DGLink,
+  Axiom,
+  Declaration,
+  Theorem,
+  Reference
+} from "../../shared/DGraph";
+
+type NLabel = {
+  label?: string;
+  axioms?: Axiom[];
+  declarations?: Declaration[];
+  theorems?: Theorem[];
+  logic?: string;
+  internal?: boolean;
+  reference?: boolean;
+  Reference?: Reference;
+  style?: string;
+  shape?: string;
+};
+
+export type NodeLabel = Node & NLabel;
+
+type ELabel = {
+  label?: string;
+  style?: string;
+  arrowheadStyle?: string;
+  ConsStatus?: string;
+  Rule?: string;
+  Type?: string;
+};
+
+export type EdgeLabel = GraphEdge & ELabel;
+
+const edgeStyle = (e: DGLink): string => {
   return e.Type.includes("Unproven")
     ? "stroke: #e5647a; fill: none;"
     : e.Type.includes("Proven")
@@ -12,7 +48,7 @@ const edgeStyle = (e: DGLink) => {
         : "stroke: #999; fill: none;";
 };
 
-const arrowheadStyle = (e: DGLink) => {
+const arrowheadStyle = (e: DGLink): string => {
   return e.Type.includes("Unproven")
     ? "stroke: #e5647a; fill: #e5647a;"
     : e.Type.includes("Proven")
@@ -22,7 +58,7 @@ const arrowheadStyle = (e: DGLink) => {
         : "stroke: #999; fill: #999;";
 };
 
-const nodeStyle = (n: DGNode) => {
+const nodeStyle = (n: DGNode): { style: string; shape: string } => {
   return {
     style:
       n.Theorems.length > 0

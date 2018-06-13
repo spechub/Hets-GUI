@@ -1,15 +1,15 @@
 import * as React from "react";
 import * as d3 from "d3";
-import { Event } from "electron";
+import * as dagreD3 from "dagre-d3";
 
-import { GraphControls } from "./GraphControls";
-import { DGNode, DGLink } from "../../shared/DGraph";
+import { Edge } from "dagre-d3";
+
+import { NodeLabel, EdgeLabel } from "../actions/GraphHelper";
 
 export interface FDGraphProps {
-  width: string;
-  height: string;
-  nodes: DGNode[];
-  edges: DGLink[];
+  width: number;
+  height: number;
+  graph: dagreD3.graphlib.Graph;
 }
 
 interface InternalNode {
@@ -22,10 +22,11 @@ interface InternalLink {
   id: number;
   source: number;
   target: number;
-  unproven: boolean;
-  proven: boolean;
-  internal: boolean;
+  unproven?: boolean;
+  proven?: boolean;
+  internal?: boolean;
   loops: boolean;
+  style: string;
 }
 
 export class FDGraph extends React.Component<FDGraphProps> {
@@ -42,31 +43,26 @@ export class FDGraph extends React.Component<FDGraphProps> {
   zoom: d3.ZoomBehavior<any, any>;
   currentZoomTransform: any;
 
-  constructor(props: any) {
+  constructor(props: FDGraphProps) {
     super(props);
 
-    this.internalEdges = false;
+    this.internalEdges = true;
     this.internalNodes = true;
   }
 
   componentDidMount() {
     this.prepareRender();
-    this.prepareData(this.props.nodes, this.props.edges);
+    this.prepareData();
   }
 
   componentDidUpdate() {
-    this.prepareData(this.props.nodes, this.props.edges);
+    this.prepareData();
   }
 
   render() {
     return (
       <>
         <svg width={this.props.width} height={this.props.height} />
-        <GraphControls
-          edgeStrengthsChanged={this.inputted.bind(this)}
-          showInternalEdges={this.showInternalEdges.bind(this)}
-          showInternalNodes={this.showInternalNodes.bind(this)}
-        />
       </>
     );
   }
@@ -102,65 +98,34 @@ export class FDGraph extends React.Component<FDGraphProps> {
     this.svg.call(this.zoom);
   }
 
-  private inputted(_e: Event, _d: any) {
-    // (this.simulation.force("link") as any).strength(+d.value);
-    // this.simulation.alpha(1).restart();
-  }
-
-  private showInternalEdges() {
-    this.internalEdges = !this.internalEdges;
-    if (this.props.nodes && this.props.edges) {
-      this.prepareData(this.props.nodes, this.props.edges);
+  private prepareData() {
+    if (!this.props.graph) {
+      return;
     }
-  }
 
-  private showInternalNodes() {
-    this.internalNodes = !this.internalNodes;
-    if (this.props.nodes && this.props.edges) {
-      this.prepareData(this.props.nodes, this.props.edges);
-    }
-  }
-
-  private prepareData(n: DGNode[], e: DGLink[]) {
     const links: InternalLink[] = [];
     const nodes: InternalNode[] = [];
-    const excludedNodes: number[] = [];
 
-    for (const node of n) {
-      if (!this.internalNodes && node.internal) {
-        excludedNodes.push(node.id);
-        continue;
-      }
+    this.props.graph.nodes().forEach((gNode: string) => {
+      const nLabels: NodeLabel = this.props.graph.node(gNode);
 
       nodes.push({
-        id: node.id,
-        name: node.name,
-        internal: node.internal
+        id: +gNode,
+        name: nLabels.label,
+        internal: nLabels.internal
       });
-    }
+    });
 
-    for (const link of e) {
-      if (!this.internalEdges && !link.Type.includes("Def")) {
-        continue;
-      }
-
-      if (
-        excludedNodes.includes(link.id_source) ||
-        excludedNodes.includes(link.id_target)
-      ) {
-        continue;
-      }
-
+    this.props.graph.edges().forEach((gEdge: Edge, i: number) => {
+      const eLabels: EdgeLabel = this.props.graph.edge(gEdge);
       links.push({
-        id: link.linkid,
-        source: link.id_source,
-        target: link.id_target,
-        unproven: link.Type.includes("Unproven"),
-        proven: link.Type.includes("Proven"),
-        internal: !link.Type.includes("Def"),
-        loops: false
+        id: i,
+        source: +gEdge.v,
+        target: +gEdge.w,
+        loops: false,
+        style: eLabels.style
       });
-    }
+    });
 
     for (const link of links) {
       for (const other of links) {
@@ -178,7 +143,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
     this.updateGraphRender(links, nodes);
   }
 
-  private updateGraphRender(links: InternalLink[], nodes: any) {
+  private updateGraphRender(links: InternalLink[], nodes: InternalNode[]) {
     this.base.remove();
     this.base = this.svg.append("g");
     this.base.attr("transform", this.currentZoomTransform);
@@ -229,15 +194,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
       .data(links)
       .enter()
       .append("path")
-      .attr("stroke-width", 1)
-      .attr("class", (l: InternalLink) => {
-        if (l.unproven) {
-          return "unproven";
-        } else if (l.proven) {
-          return "proven";
-        } else {
-          return "";
-        }
+      .attr("style", (l: InternalLink) => {
+        return l.style;
       })
       .attr("marker-end", (l: InternalLink) => {
         if (l.unproven) {
@@ -258,7 +216,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
       .append("g")
       .call(
         d3
-          .drag()
+          .drag<any, InternalNode>()
           .on("start", this.dragstarted.bind(this))
           .on("drag", this.dragged.bind(this))
           .on("end", this.dragended.bind(this))
