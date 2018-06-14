@@ -16,6 +16,8 @@ interface InternalNode {
   id: number;
   name: string;
   internal: boolean;
+  style: string;
+  bBox?: { width: number; height: number };
 }
 
 interface InternalLink {
@@ -27,6 +29,7 @@ interface InternalLink {
   internal?: boolean;
   loops: boolean;
   style: string;
+  arrowHeadStyle: string;
 }
 
 export class FDGraph extends React.Component<FDGraphProps> {
@@ -35,6 +38,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
   base: d3.Selection<Element, any, HTMLElement, any>;
 
   link: any;
+  path: any;
   node: any;
 
   internalEdges: boolean;
@@ -112,7 +116,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
       nodes.push({
         id: +gNode,
         name: nLabels.label,
-        internal: nLabels.internal
+        internal: nLabels.internal,
+        style: nLabels.style
       });
     });
 
@@ -123,7 +128,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
         source: +gEdge.v,
         target: +gEdge.w,
         loops: false,
-        style: eLabels.style
+        style: eLabels.style,
+        arrowHeadStyle: eLabels.arrowheadStyle
       });
     });
 
@@ -148,63 +154,40 @@ export class FDGraph extends React.Component<FDGraphProps> {
     this.base = this.svg.append("g");
     this.base.attr("transform", this.currentZoomTransform);
 
-    this.base
-      .append("defs")
-      .append("marker")
-      .attr("id", "arrow")
-      .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 5)
-      .attr("refY", 0)
-      .attr("markerWidth", 5)
-      .attr("markerHeight", 5)
-      .attr("orient", "auto")
-      .append("svg:path")
-      .attr("d", "M0,-5L10,0L0,5");
-
-    this.base
-      .append("defs")
-      .append("marker")
-      .attr("id", "arrow-unproven")
-      .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 5)
-      .attr("refY", 0)
-      .attr("markerWidth", 5)
-      .attr("markerHeight", 5)
-      .attr("orient", "auto")
-      .append("svg:path")
-      .attr("d", "M0,-5L10,0L0,5");
-
-    this.base
-      .append("defs")
-      .append("marker")
-      .attr("id", "arrow-proven")
-      .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 5)
-      .attr("refY", 0)
-      .attr("markerWidth", 5)
-      .attr("markerHeight", 5)
-      .attr("orient", "auto")
-      .append("svg:path")
-      .attr("d", "M0,-5L10,0L0,5");
-
     this.link = this.base
       .append("g")
       .attr("class", "links")
       .selectAll(".line")
       .data(links)
       .enter()
+      .append("g")
+      .attr("class", "line");
+
+    this.path = this.link
       .append("path")
       .attr("style", (l: InternalLink) => {
         return l.style;
       })
-      .attr("marker-end", (l: InternalLink) => {
-        if (l.unproven) {
-          return "url(#arrow-unproven)";
-        } else if (l.proven) {
-          return "url(#arrow-proven)";
-        } else {
-          return "url(#arrow)";
-        }
+      .attr("marker-end", (_: InternalLink, i: number) => {
+        return `url(#arrowhead${i})`;
+      });
+
+    this.link
+      .append("defs")
+      .append("marker")
+      .attr("id", (_: InternalLink, i: number) => {
+        return "arrowhead" + i;
+      })
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 5)
+      .attr("refY", 0)
+      .attr("markerWidth", 5)
+      .attr("markerHeight", 5)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("d", "M0,-5L10,0L0,5")
+      .attr("style", (l: InternalLink) => {
+        return l.arrowHeadStyle;
       });
 
     this.node = this.base
@@ -227,7 +210,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
     });
 
     this.node
-      .filter((d: any) => {
+      .filter((d: InternalNode) => {
         return !d.internal;
       })
       .append("text")
@@ -235,25 +218,30 @@ export class FDGraph extends React.Component<FDGraphProps> {
       .attr("x", 0)
       .attr("y", 4.5)
       .classed("center-text", true)
-      .text((n: any) => {
+      .text((n: InternalNode) => {
         return n.name;
       });
 
-    d3.selectAll(".nodes text").each((d: any, i: number, nodes: any[]) => {
-      d.bBox = nodes[i].getBBox();
-    });
+    d3.selectAll(".nodes text").each(
+      (d: InternalNode, i: number, nodes: any[]) => {
+        d.bBox = nodes[i].getBBox();
+      }
+    );
 
     this.node
       .append("ellipse")
       .lower()
-      .attr("rx", (d: any) => {
+      .attr("rx", (d: InternalNode) => {
         return d.bBox ? d.bBox.width / 2 + 6 : 10;
       })
-      .attr("ry", (d: any) => {
+      .attr("ry", (d: InternalNode) => {
         return d.bBox ? d.bBox.height : 5;
       })
-      .attr("class", (n: any) => {
+      .attr("class", (n: InternalNode) => {
         return n.internal ? "internal" : "fd-node";
+      })
+      .attr("style", (n: InternalNode) => {
+        return n.style;
       });
 
     this.simulation.alpha(1).restart();
@@ -262,7 +250,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
   }
 
   private ticked() {
-    this.link.attr("d", this.positionLink.bind(this));
+    this.path.attr("d", this.positionLink.bind(this));
 
     this.node.attr("transform", (n: any) => {
       return `translate(${n.x} ${n.y})`;
