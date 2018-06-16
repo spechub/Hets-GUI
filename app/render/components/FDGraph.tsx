@@ -2,7 +2,7 @@ import * as React from "react";
 import * as d3 from "d3";
 import * as dagreD3 from "dagre-d3";
 
-import { Edge } from "dagre-d3";
+import { Edge, Node, GraphEdge } from "dagre-d3";
 
 import { NodeLabel, EdgeLabel } from "../actions/GraphHelper";
 
@@ -10,6 +10,8 @@ export interface FDGraphProps {
   width: number;
   height: number;
   graph: dagreD3.graphlib.Graph;
+  onSelectNode: (node: Node) => void;
+  onSelectEdge: (edge: GraphEdge) => void;
 }
 
 interface InternalNode {
@@ -30,6 +32,7 @@ interface InternalLink {
   loops: boolean;
   style: string;
   arrowHeadStyle: string;
+  between: { v: string; w: string };
 }
 
 export class FDGraph extends React.Component<FDGraphProps> {
@@ -129,7 +132,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
         target: +gEdge.w,
         loops: false,
         style: eLabels.style,
-        arrowHeadStyle: eLabels.arrowheadStyle
+        arrowHeadStyle: eLabels.arrowheadStyle,
+        between: { v: gEdge.v, w: gEdge.w }
       });
     });
 
@@ -197,6 +201,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
       .data(nodes)
       .enter()
       .append("g")
+      .attr("class", "node")
       .call(
         d3
           .drag<any, InternalNode>()
@@ -243,6 +248,14 @@ export class FDGraph extends React.Component<FDGraphProps> {
       .attr("style", (n: InternalNode) => {
         return n.style;
       });
+
+    this.base.selectAll("g.node").on("click", (n: InternalNode) => {
+      this.props.onSelectNode(this.props.graph.node(n.id.toString()));
+    });
+
+    this.base.selectAll("g.line").on("click", (l: InternalLink) => {
+      this.props.onSelectEdge(this.props.graph.edge(l.between.v, l.between.w));
+    });
 
     this.simulation.alpha(1).restart();
     this.simulation.nodes(nodes).on("tick", this.ticked.bind(this));
