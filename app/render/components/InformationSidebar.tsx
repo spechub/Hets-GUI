@@ -1,13 +1,14 @@
 import * as React from "react";
-import * as dagreD3 from "dagre-d3";
 import { Button } from "semantic-ui-react";
 import { Accordion } from "semantic-ui-react";
-import { Theorem, Declaration, SenSymbol } from "../../shared/DGraph";
+
+import { Theorem, Declaration, SenSymbol, Axiom } from "../../shared/DGraph";
 import { EGraphRenderer } from "../reducers/reducer";
+import { NodeLabel, EdgeLabel } from "../actions/GraphHelper";
 
 export interface InformationSidebarProps {
-  node: dagreD3.Node;
-  edge: dagreD3.GraphEdge;
+  node: NodeLabel;
+  edge: EdgeLabel;
   hidden: boolean;
   renderer: EGraphRenderer;
   onHideInternal: () => void;
@@ -68,12 +69,38 @@ export class InformationSidebar extends React.Component<
         }
       );
 
+      const axiomContent = this.props.node.axioms.map(
+        (axiom: Axiom, i: number) => {
+          return {
+            title: axiom.name,
+            key: "axiom-" + i,
+            content: [
+              <div key={"ax-" + i} className="text-mono">
+                {axiom.Axiom}
+              </div>
+            ].concat(
+              axiom.SenSymbols.map((sym: SenSymbol, i: number) => {
+                return (
+                  <div key={i} className="text-mono">
+                    {sym.Symbol}
+                  </div>
+                );
+              })
+            )
+          };
+        }
+      );
+
       const DeclAccordion = (
         <Accordion.Accordion panels={declContent} exclusive={false} />
       );
 
       const TheoAccordion = (
         <Accordion.Accordion panels={theoContent} exclusive={false} />
+      );
+
+      const AxiomAccordion = (
+        <Accordion.Accordion panels={axiomContent} exclusive={false} />
       );
 
       this.rootPanels = [];
@@ -87,6 +114,12 @@ export class InformationSidebar extends React.Component<
         this.rootPanels.push({
           title: "Declarations",
           content: { content: DeclAccordion, key: "content-2" }
+        });
+      }
+      if (this.props.node.axioms.length > 0) {
+        this.rootPanels.push({
+          title: "Axioms",
+          content: { content: AxiomAccordion, key: "axiom-content" }
         });
       }
     }

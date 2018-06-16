@@ -85,6 +85,13 @@ class AxiomImpl implements Axiom, Serializable<Axiom> {
     this.name = input["name"];
     this.range = input["range"];
 
+    this.SenSymbols = [];
+    if (input["SenSymbols"]) {
+      input["SenSymbols"].forEach((symbol: any) => {
+        this.SenSymbols.push(new SenSymbolImpl().deserialize(symbol));
+      });
+    }
+
     return this;
   }
 }
