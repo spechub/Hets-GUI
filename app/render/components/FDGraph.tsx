@@ -253,10 +253,18 @@ export class FDGraph extends React.Component<FDGraphProps> {
 
     this.base.selectAll("g.node").on("click", (n: InternalNode) => {
       this.props.onSelectNode(this.props.graph.node(n.id.toString()));
+      d3.event.stopPropagation();
     });
 
     this.base.selectAll("g.line").on("click", (l: InternalLink) => {
       this.props.onSelectEdge(this.props.graph.edge(l.between.v, l.between.w));
+      d3.event.stopPropagation();
+    });
+
+    this.svg.on("click", () => {
+      this.props.onSelectEdge(null);
+      this.props.onSelectNode(null);
+      d3.event.stopPropagation();
     });
 
     this.simulation.alpha(1).restart();
