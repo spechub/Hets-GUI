@@ -246,7 +246,9 @@ export class FDGraph extends React.Component<FDGraphProps> {
         return n.internal ? "internal" : "fd-node";
       })
       .attr("style", (n: InternalNode) => {
-        return n.style;
+        return (n.style += n.internal
+          ? `fill: ${this.getStrokeColor(n.style)}`
+          : "");
       });
 
     this.base.selectAll("g.node").on("click", (n: InternalNode) => {
@@ -324,5 +326,11 @@ export class FDGraph extends React.Component<FDGraphProps> {
     if (!d3.event.active) this.simulation.alphaTarget(0);
     d.fx = null;
     d.fy = null;
+  }
+
+  private getStrokeColor(s: string): string {
+    const re = /stroke:\s(#\w{6});/g;
+    const res = re.exec(s);
+    return res.length > 1 ? res[1] : "";
   }
 }
