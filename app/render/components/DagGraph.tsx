@@ -17,7 +17,7 @@ export class DagGraph extends React.Component<DagGraphProps, {}> {
   constructor(props: DagGraphProps) {
     super(props);
 
-    this.scale = { k: 0.75, x: 0, y: 0 };
+    this.scale = { k: 0.75, x: 0, y: 20 };
 
     this.displayGraph = this.displayGraph.bind(this);
   }
@@ -66,9 +66,11 @@ export class DagGraph extends React.Component<DagGraphProps, {}> {
       d3.event.stopPropagation();
     });
 
+    const gWidth = (this.props.width - graph.graph().width * this.scale.k) / 2;
+
     svg.call(
       zoom.transform,
-      d3.zoomIdentity.translate(this.scale.x, this.scale.y).scale(this.scale.k)
+      d3.zoomIdentity.translate(gWidth, this.scale.y).scale(this.scale.k)
     );
   }
 
