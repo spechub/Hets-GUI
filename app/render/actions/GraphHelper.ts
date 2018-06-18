@@ -40,12 +40,12 @@ export type EdgeLabel = GraphEdge & ELabel;
 
 const edgeStyle = (e: DGLink): string => {
   return e.Type.includes("Unproven")
-    ? "stroke: #e5647a; fill: none;"
+    ? "stroke: #e5647a; fill: none; stroke-width: 2px;"
     : e.Type.includes("Proven")
-      ? "stroke: #b8db95; fill: none;"
+      ? "stroke: #b8db95; fill: none; stroke-width: 2px;"
       : e.Type.includes("Hiding")
-        ? "stroke: #6babef; fill: none;"
-        : "stroke: #999; fill: none;";
+        ? "stroke: #6babef; fill: none; stroke-width: 2px;"
+        : "stroke: #999; fill: none; stroke-width: 2px;";
 };
 
 const arrowheadStyle = (e: DGLink): string => {
