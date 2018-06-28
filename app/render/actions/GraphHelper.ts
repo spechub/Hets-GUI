@@ -115,7 +115,7 @@ export function constructGraph(
   nodes: DGNode[],
   edges: DGLink[]
 ): dagreD3.graphlib.Graph {
-  const graph = new dagreD3.graphlib.Graph()
+  const graph = new dagreD3.graphlib.Graph({ multigraph: true })
     .setGraph({
       // ranker: "longest-path"
     })
@@ -138,15 +138,20 @@ export function constructGraph(
   });
 
   edges.forEach(e => {
-    graph.setEdge(e.id_source.toString(), e.id_target.toString(), {
-      label: e.name ? e.name : "",
-      curve: d3.curveBasis,
-      style: edgeStyle(e),
-      arrowheadStyle: arrowheadStyle(e),
-      ConsStatus: e.ConsStatus,
-      Rule: e.Rule,
-      Type: e.Type
-    });
+    graph.setEdge(
+      e.id_source.toString(),
+      e.id_target.toString(),
+      {
+        label: e.name ? e.name : "",
+        curve: d3.curveBasis,
+        style: edgeStyle(e),
+        arrowheadStyle: arrowheadStyle(e),
+        ConsStatus: e.ConsStatus,
+        Rule: e.Rule,
+        Type: e.Type
+      },
+      e.linkid.toString()
+    );
   });
 
   return graph;
