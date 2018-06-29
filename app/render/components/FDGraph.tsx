@@ -257,7 +257,9 @@ export class FDGraph extends React.Component<FDGraphProps> {
     });
 
     this.base.selectAll("g.line").on("click", (l: InternalLink) => {
-      this.props.onSelectEdge(this.props.graph.edge(l.between.v, l.between.w));
+      this.props.onSelectEdge(
+        this.props.graph.edge(l.between.v, l.between.w, l.id.toString())
+      );
       d3.event.stopPropagation();
     });
 
