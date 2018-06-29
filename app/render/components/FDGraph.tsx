@@ -280,8 +280,10 @@ export class FDGraph extends React.Component<FDGraphProps> {
     });
   }
 
-  private positionLink(l: any) {
-    if (l.loops) {
+  private positionLink(l: any, i: number) {
+    if (l.source.id === l.target.id && l.loops) {
+      return this.selfEdge(l, i);
+    } else if (l.loops) {
       return `M ${l.source.x} ${l.source.y} Q ${this.offsetLoop(l).x} ${
         this.offsetLoop(l).y
       }, ${this.shortenEndLoop(l).x} ${this.shortenEndLoop(l).y}`;
@@ -292,9 +294,32 @@ export class FDGraph extends React.Component<FDGraphProps> {
     }
   }
 
+  private selfEdge(l: any, i: number) {
+    const line = d3.line().curve(d3.curveBasis);
+
+    const vec = {
+      x: l.target.x - l.target.x + 40 * (i + 1),
+      y: l.target.y - l.target.y - 20 * (i + 1)
+    };
+    let len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    len = len <= 0 ? 1 : len;
+    const lastPnt = {
+      x: l.target.x + (vec.x / len) * 20,
+      y: l.target.y + (vec.y / len) * 20
+    };
+
+    return line([
+      [l.source.x, l.source.y],
+      [l.source.x + 40 * (i + 1), l.source.y + 20 * (i + 1)],
+      [l.target.x + 40 * (i + 1), l.target.y - 20 * (i + 1)],
+      [lastPnt.x, lastPnt.y]
+    ]);
+  }
+
   private shortenEnd(d: any) {
     const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
-    const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    let len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    len = len <= 0 ? 1 : len;
     return {
       x: d.target.x - (vec.x / len) * 8,
       y: d.target.y - (vec.y / len) * 8
@@ -303,7 +328,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
 
   private offsetLoop(d: any): { x: number; y: number } {
     const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
-    const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    let len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    len = len <= 0 ? 1 : len;
     return {
       x: d.source.x + (-vec.y / len) * 20 + vec.x * 0.5,
       y: d.source.y + (vec.x / len) * 20 + vec.y * 0.5
@@ -312,7 +338,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
 
   private shortenEndLoop(d: any) {
     const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
-    const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    let len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    len = len <= 0 ? 1 : len;
     return {
       x: d.target.x + (-vec.y / len) * 7 - vec.x * 0.1,
       y: d.target.y + (vec.x / len) * 7 - vec.y * 0.1
