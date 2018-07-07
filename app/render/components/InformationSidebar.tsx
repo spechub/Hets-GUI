@@ -160,7 +160,7 @@ export class InformationSidebar extends React.Component<
                 this.props.onSwitchRenderer(EGraphRenderer.GRAPHVIZ);
               }}
             >
-              switch to graphviz layout
+              switch to hierarchical layout
             </Button>
           )}
         </p>
