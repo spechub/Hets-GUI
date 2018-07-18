@@ -166,13 +166,26 @@ export class InformationSidebar extends React.Component<
         </p>
         {this.props.node ? (
           <>
-            <b>Node</b>
-            <p>{"Name: " + this.props.node.label}</p>
-            <p>{"Logic: " + this.props.node.logic}</p>
+            <h5>Node</h5>
+            <p>{this.props.node.label}</p>
             <p>
-              {this.props.node.Reference
-                ? "Referenced from: " + this.props.node.Reference.library
-                : ""}
+              {this.props.node.logic ? (
+                <>
+                  <span>{"Logic: " + this.props.node.logic}</span>
+                  <br />
+                </>
+              ) : (
+                ""
+              )}
+              {this.props.node.Reference ? (
+                <span>
+                  {this.props.node.Reference
+                    ? "Referenced from: " + this.props.node.Reference.library
+                    : ""}
+                </span>
+              ) : (
+                ""
+              )}
             </p>
             <Accordion panels={this.rootPanels} />
           </>
@@ -181,15 +194,38 @@ export class InformationSidebar extends React.Component<
         )}
         {this.props.edge ? (
           <>
-            <b>Edge</b>
-            <p>{this.props.edge.label}</p>
-            <p>{"Type: " + this.props.edge.Type}</p>
+            <h5>Edge</h5>
+            {this.props.edge.label ? (
+              <p>{this.props.edge.label}</p>
+            ) : (
+              <p>---</p>
+            )}
             <p>
-              {this.props.edge.ConsStatus
-                ? "Cons status: " + this.props.edge.ConsStatus
-                : ""}
+              {this.props.edge.Type ? (
+                <>
+                  <span>{"Type: " + this.props.edge.Type}</span>
+                  <br />
+                </>
+              ) : (
+                ""
+              )}
+              {this.props.edge.ConsStatus ? (
+                <>
+                  <span>{"Cons status: " + this.props.edge.ConsStatus}</span>
+                  <br />
+                </>
+              ) : (
+                ""
+              )}
+              {this.props.edge.Rule ? (
+                <>
+                  <span>{"Rule: " + this.props.edge.Rule}</span>
+                  <br />
+                </>
+              ) : (
+                ""
+              )}
             </p>
-            <p>{this.props.edge.Rule ? "Rule: " + this.props.edge.Rule : ""}</p>
           </>
         ) : (
           ""
