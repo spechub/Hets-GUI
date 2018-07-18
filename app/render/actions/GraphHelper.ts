@@ -98,7 +98,8 @@ export function removeInternalEdges(
           if (eIn.v !== eOut.w) {
             graph.setEdge(eIn.v, eOut.w, {
               curve: d3.curveBasis,
-              style: "stroke: #999; fill: none;",
+              style:
+                "stroke: #999; fill: none; stroke-dasharray: 5 2; stroke-width: 2px;",
               arrowheadStyle: "stroke: #999; fill: #999;"
             }); // neue Kante von source eingehender zu target ausgehender
           }
