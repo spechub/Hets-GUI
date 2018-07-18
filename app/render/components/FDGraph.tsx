@@ -20,6 +20,7 @@ interface InternalNode {
   internal: boolean;
   style: string;
   bBox?: { width: number; height: number };
+  bounds?: { width: number; height: number };
 }
 
 interface InternalLink {
@@ -227,11 +228,17 @@ export class FDGraph extends React.Component<FDGraphProps> {
         return n.name;
       });
 
-    d3.selectAll(".nodes text").each(
-      (d: InternalNode, i: number, nodes: any[]) => {
-        d.bBox = nodes[i].getBBox();
+    d3.selectAll(".nodes text").each((d: InternalNode, i: number, n: any[]) => {
+      d.bBox = n[i].getBBox();
+      for (let node of nodes) {
+        if (node.id !== d.id) {
+          continue;
+        }
+        node.bounds = d.bBox;
+        return;
       }
-    );
+      nodes[d.id].bounds = n[i].getBBox();
+    });
 
     this.node
       .append("ellipse")
@@ -288,7 +295,7 @@ export class FDGraph extends React.Component<FDGraphProps> {
     } else if (l.loops) {
       return `M ${l.source.x} ${l.source.y} Q ${this.offsetLoop(l).x} ${
         this.offsetLoop(l).y
-      }, ${this.shortenEndLoop(l).x} ${this.shortenEndLoop(l).y}`;
+      }, ${this.shortenEnd(l).x} ${this.shortenEnd(l).y}`;
     } else {
       return `M ${l.source.x} ${l.source.y} L ${this.shortenEnd(l).x} ${
         this.shortenEnd(l).y
@@ -319,13 +326,9 @@ export class FDGraph extends React.Component<FDGraphProps> {
   }
 
   private shortenEnd(d: any) {
-    const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
-    let len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
-    len = len <= 0 ? 1 : len;
-    return {
-      x: d.target.x - (vec.x / len) * 8,
-      y: d.target.y - (vec.y / len) * 8
-    };
+    const rx = d.target.bounds ? d.target.bounds.width / 2 + 10 : 15;
+    const ry = d.target.bounds ? d.target.bounds.height + 5 : 10;
+    return this.intersectEllipse(d.target, rx, ry, d.source);
   }
 
   private offsetLoop(d: any): { x: number; y: number } {
@@ -335,16 +338,6 @@ export class FDGraph extends React.Component<FDGraphProps> {
     return {
       x: d.source.x + (-vec.y / len) * 20 + vec.x * 0.5,
       y: d.source.y + (vec.x / len) * 20 + vec.y * 0.5
-    };
-  }
-
-  private shortenEndLoop(d: any) {
-    const vec = { x: d.target.x - d.source.x, y: d.target.y - d.source.y };
-    let len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
-    len = len <= 0 ? 1 : len;
-    return {
-      x: d.target.x + (-vec.y / len) * 7 - vec.x * 0.1,
-      y: d.target.y + (vec.x / len) * 7 - vec.y * 0.1
     };
   }
 
@@ -369,5 +362,34 @@ export class FDGraph extends React.Component<FDGraphProps> {
     const re = /stroke:\s(#\w{6});/g;
     const res = re.exec(s);
     return res.length > 1 ? res[1] : "";
+  }
+
+  private intersectEllipse(
+    node: { x: number; y: number },
+    rx: number,
+    ry: number,
+    point: { x: number; y: number }
+  ): { x: number; y: number } {
+    // Formulae from: http://mathworld.wolfram.com/Ellipse-LineIntersection.html
+    // implemetation borrowed from dagre-d3
+
+    const cx = node.x;
+    const cy = node.y;
+
+    const px = cx - point.x;
+    const py = cy - point.y;
+
+    const det = Math.sqrt(rx * rx * py * py + ry * ry * px * px);
+
+    let dx = Math.abs((rx * ry * px) / det);
+    if (point.x < cx) {
+      dx = -dx;
+    }
+    let dy = Math.abs((rx * ry * py) / det);
+    if (point.y < cy) {
+      dy = -dy;
+    }
+
+    return { x: cx + dx, y: cy + dy };
   }
 }
