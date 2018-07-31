@@ -76,11 +76,19 @@ export class OpenUrl extends React.Component<OpenUrlProps, OpenUrlState> {
   }
 
   private openFile() {
+    if (this.state.filePath === "") {
+      return;
+    }
+
     this.setState({ loading: true });
     IPCComm.queryHets(this.state.filePath, URLType.File);
   }
 
   private openWeb() {
+    if (this.state.filePath === "") {
+      return;
+    }
+
     this.setState({ loading: true });
     IPCComm.queryHets(this.state.filePath, URLType.Web);
   }
