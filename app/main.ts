@@ -1,6 +1,7 @@
 import { app, dialog, BrowserWindow, ipcMain, Event } from "electron";
 import * as path from "path";
 import * as url from "url";
+import * as request from "request";
 
 import { Utils } from "./utils";
 import {
@@ -64,31 +65,35 @@ app.on("activate", () => {
 });
 
 ipcMain.on(QUERY_CHANNEL, (event: Event, message: any) => {
-  Utils.queryHETSApi(
+  const url = Utils.constructURL(
     message.hostname,
     message.port,
     message.file,
     message.type,
     message.command_list
-  )
-    .catch((err: Error) => {
+  );
+
+  request(url, (err: Error, resp: request.Response, body: string) => {
+    if (err) {
       console.error(err);
-      if (err.message === "422") {
+      event.sender.send(QUERY_CHANNEL_RESPONSE, "");
+      return;
+    }
+
+    if (resp.statusCode !== 200) {
+      if (resp.statusCode === 422) {
         dialog.showErrorBox(
           "Could not open file!",
-          `Hets returned with error code: ${err.message}.`
-        );
-      } else {
-        dialog.showErrorBox(
-          "Unknown error!",
-          `Hets returned with error code: ${err.message}.`
+          `Hets returned with error code: ${resp.statusCode}.`
         );
       }
+      console.error("Got status code: " + resp.statusCode);
       event.sender.send(QUERY_CHANNEL_RESPONSE, "");
-    })
-    .then((res: JSON) => {
-      event.sender.send(QUERY_CHANNEL_RESPONSE, res);
-    });
+      return;
+    }
+
+    event.sender.send(QUERY_CHANNEL_RESPONSE, JSON.parse(body));
+  });
 });
 
 ipcMain.on(CONFIG_GET_CHANNEL, (event: Event, _message: any) => {
@@ -105,26 +110,41 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
       properties: ["openFile"]
     },
     (paths: string[]) => {
-      if (paths != undefined) {
-        const path = paths[0];
-        console.log('==> Open File: "' + path + '"');
-        Utils.queryHETSApi(
-          message.hostname,
-          message.port,
-          path,
-          URLType.File,
-          message.command_list
-        )
-          .catch((err: Error) => {
-            console.error(err.message);
-            dialog.showErrorBox("Network Error", err.message);
-          })
-          .then((res: JSON) => {
-            event.sender.send(QUERY_CHANNEL_RESPONSE, res);
-          });
-      } else {
+      if (paths === undefined) {
         event.sender.send(OPEN_FILE_CANCEL);
+        return;
       }
+
+      const path = paths[0];
+      const url = Utils.constructURL(
+        message.hostname,
+        message.port,
+        path,
+        URLType.File,
+        message.command_list
+      );
+
+      request(url, (err: Error, resp: request.Response, body: string) => {
+        if (err) {
+          console.error(err);
+          event.sender.send(QUERY_CHANNEL_RESPONSE, "");
+          return;
+        }
+
+        if (resp.statusCode !== 200) {
+          if (resp.statusCode === 422) {
+            dialog.showErrorBox(
+              "Could not open file!",
+              `Hets returned with error code: ${resp.statusCode}.`
+            );
+          }
+          console.error("Got status code: " + resp.statusCode);
+          event.sender.send(QUERY_CHANNEL_RESPONSE, "");
+          return;
+        }
+
+        event.sender.send(QUERY_CHANNEL_RESPONSE, JSON.parse(body));
+      });
     }
   );
 });

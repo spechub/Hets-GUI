@@ -12,6 +12,31 @@ interface HETSApiOptions {
 }
 
 export class Utils {
+  public static constructURL(
+    hostname: string,
+    port: number,
+    filepath: string,
+    type: URLType,
+    command_list: string
+  ): string {
+    let escapedURL = "";
+    let path = "";
+    if (type === URLType.File) {
+      escapedURL = querystring.escape("file:///" + filepath);
+      path = `/dg/${escapedURL}/${command_list}?format=json`;
+
+      return `http://${hostname}:${port}${path}`;
+    } else if (type === URLType.Web) {
+      escapedURL = querystring.escape(filepath);
+      path = `/dg/${escapedURL}/?format=json`;
+
+      return hostname + path;
+    } else {
+      console.warn("Got URL of unsupported type!");
+      return "";
+    }
+  }
+
   public static async queryHETSApi(
     hostname: string,
     port: number,
