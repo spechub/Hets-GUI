@@ -1,4 +1,4 @@
-import { ipcRenderer, Event, remote } from "electron";
+import { ipcRenderer, Event } from "electron";
 
 import {
   QUERY_CHANNEL,
@@ -19,13 +19,6 @@ export class IPCComm {
       type: type,
       command_list: ""
     };
-
-    remote.getCurrentWindow().setTitle(
-      `Hets - ${file
-        .split("/")
-        .slice(-1)
-        .pop()}`
-    );
 
     ipcRenderer.send(QUERY_CHANNEL, message);
   }

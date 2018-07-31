@@ -11,6 +11,8 @@ import {
   SenSymbol
 } from "../../shared/DGraph";
 
+import { remote } from "electron";
+
 interface Serializable<T> {
   deserialize(input: any): T;
 }
@@ -259,5 +261,15 @@ export class DGraphParser {
       return;
     }
     this.dgraph = new DGraphImpl().deserialize(dgraph["DGraph"]);
+    this.setTitle(this.dgraph.filename);
+  }
+
+  private setTitle(file: string) {
+    remote.getCurrentWindow().setTitle(
+      `Hets - ${file
+        .split("/")
+        .slice(-1)
+        .pop()}`
+    );
   }
 }
