@@ -34,6 +34,7 @@ interface InternalLink {
   style: string;
   arrowHeadStyle: string;
   between: { v: string; w: string };
+  name: string;
 }
 
 export class FDGraph extends React.Component<FDGraphProps> {
@@ -134,7 +135,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
         loops: false,
         style: eLabels.style,
         arrowHeadStyle: eLabels.arrowheadStyle,
-        between: { v: gEdge.v, w: gEdge.w }
+        between: { v: gEdge.v, w: gEdge.w },
+        name: gEdge.name
       });
     });
 
@@ -264,9 +266,8 @@ export class FDGraph extends React.Component<FDGraphProps> {
     });
 
     this.base.selectAll("g.line").on("click", (l: InternalLink) => {
-      this.props.onSelectEdge(
-        this.props.graph.edge(l.between.v, l.between.w, l.id.toString())
-      );
+      const edge = this.props.graph.edge(l.between.v, l.between.w, l.name);
+      this.props.onSelectEdge(edge);
       d3.event.stopPropagation();
     });
 
