@@ -8,6 +8,14 @@ import {
 import { URLType, ConfigDesc } from "../../shared/Types";
 
 export class IPCComm {
+  public static localHets(): boolean {
+    const config: ConfigDesc = ipcRenderer.sendSync(CONFIG_GET_CHANNEL);
+    return (
+      config.hets_hostname === "localhost" ||
+      config.hets_hostname === "127.0.0.1"
+    );
+  }
+
   public static queryHets(file: string, type: URLType) {
     const config = ipcRenderer.sendSync(CONFIG_GET_CHANNEL) as ConfigDesc;
 

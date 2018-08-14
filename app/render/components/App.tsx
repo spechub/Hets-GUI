@@ -7,9 +7,11 @@ import { OpenFile } from "../components/OpenFile";
 import VisibleInformationSidebar from "../containers/VisibleInformationSidebar";
 import DataReceiverContainer from "../containers/DataReceiver";
 import GraphRendererContainer from "../containers/GraphRenderer";
+import { IPCComm } from "../actions/IPCComm";
 
 export default class App extends React.Component {
   render() {
+    const localHets = IPCComm.localHets();
     return (
       <>
         <DataReceiverContainer />
@@ -21,12 +23,20 @@ export default class App extends React.Component {
             <Grid.Column width={13}>
               <Grid.Column>
                 <Grid columns="equal" id="top">
-                  <Grid.Column>
-                    <OpenFile />
-                  </Grid.Column>
-                  <Grid.Column width={13}>
-                    <OpenUrl />
-                  </Grid.Column>
+                  {localHets ? (
+                    <>
+                      <Grid.Column>
+                        <OpenFile />
+                      </Grid.Column>
+                      <Grid.Column width={13}>
+                        <OpenUrl />
+                      </Grid.Column>
+                    </>
+                  ) : (
+                    <Grid.Column>
+                      <OpenUrl />
+                    </Grid.Column>
+                  )}
                 </Grid>
               </Grid.Column>
               <Grid.Column>
