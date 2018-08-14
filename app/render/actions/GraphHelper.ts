@@ -34,6 +34,7 @@ type ELabel = {
   ConsStatus?: string;
   Rule?: string;
   Type?: string;
+  GMorphism?: string[];
 };
 
 export type EdgeLabel = GraphEdge & ELabel;
@@ -45,7 +46,9 @@ const edgeStyle = (e: DGLink): string => {
       ? "stroke: #b8db95; fill: none; stroke-width: 2px;"
       : e.Type.includes("Hiding")
         ? "stroke: #6babef; fill: none; stroke-width: 2px;"
-        : "stroke: #999; fill: none; stroke-width: 2px;";
+        : e.Type.includes("HetDefInc")
+          ? "stroke: #a333c8; fill: none; stroke-width: 2px;"
+          : "stroke: #999; fill: none; stroke-width: 2px;";
 };
 
 const arrowheadStyle = (e: DGLink): string => {
@@ -55,7 +58,9 @@ const arrowheadStyle = (e: DGLink): string => {
       ? "stroke: #b8db95; fill: #b8db95;"
       : e.Type.includes("Hiding")
         ? "stroke: #6babef; fill: #6babef;"
-        : "stroke: #999; fill: #999;";
+        : e.Type.includes("HetDefInc")
+          ? "stroke: #a333c8; fill: #a333c8;"
+          : "stroke: #999; fill: #999;";
 };
 
 const nodeStyle = (n: DGNode): { style: string; shape: string } => {
@@ -149,7 +154,8 @@ export function constructGraph(
         arrowheadStyle: arrowheadStyle(e),
         ConsStatus: e.ConsStatus,
         Rule: e.Rule,
-        Type: e.Type
+        Type: e.Type,
+        GMorphism: formatGMorphism(e.GMorphism.name)
       },
       e.linkid.toString()
     );
@@ -157,3 +163,10 @@ export function constructGraph(
 
   return graph;
 }
+
+const formatGMorphism = (g: string): string[] => {
+  const parts = g.split(";");
+  return parts.map((p: string) => {
+    return p.replace("2", " → ");
+  });
+};

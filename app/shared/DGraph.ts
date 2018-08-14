@@ -11,7 +11,7 @@ export interface DGraph {
 
 export interface DGLink {
   ConsStatus?: string;
-  GMorphisms: GMorphism;
+  GMorphism: GMorphism;
   Type: string;
   id_source: number;
   id_target: number;

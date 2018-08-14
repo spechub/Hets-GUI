@@ -17,9 +17,19 @@ interface Serializable<T> {
   deserialize(input: any): T;
 }
 
+class GMorphismImpl implements GMorphism, Serializable<GMorphism> {
+  name: string;
+
+  deserialize(input: any): GMorphism {
+    this.name = input["name"] ? input["name"] : "";
+
+    return this;
+  }
+}
+
 class DGLinkImpl implements DGLink, Serializable<DGLink> {
   ConsStatus?: string;
-  GMorphisms: GMorphism;
+  GMorphism: GMorphism;
   Type: string;
   id_source: number;
   id_target: number;
@@ -39,6 +49,7 @@ class DGLinkImpl implements DGLink, Serializable<DGLink> {
     this.target = input["target"];
     this.name = input["name"] ? input["name"] : null;
     this.Rule = input["Rule"] ? input["Rule"] : null;
+    this.GMorphism = new GMorphismImpl().deserialize(input["GMorphism"]);
 
     return this;
   }

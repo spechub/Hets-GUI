@@ -215,6 +215,21 @@ export class InformationSidebar extends React.Component<
               ) : (
                 ""
               )}
+              {this.props.edge.GMorphism &&
+              this.props.edge.Type &&
+              this.props.edge.Type.includes("HetDefInc") ? (
+                <>
+                  <span>{"Morphism:"}</span>
+                  <ul className="gmorph-list">
+                    {this.props.edge.GMorphism.map((v: string, i: number) => {
+                      return <li key={"gmorph-" + i}>{v}</li>;
+                    })}
+                  </ul>
+                  <br />
+                </>
+              ) : (
+                ""
+              )}
               {this.props.edge.ConsStatus ? (
                 <>
                   <span>{"Cons status: " + this.props.edge.ConsStatus}</span>
