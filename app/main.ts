@@ -19,7 +19,7 @@ let win: BrowserWindow = null;
 
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 600 });
+  win = new BrowserWindow({ width: 960, height: 600 });
 
   // and load the index.html of the app.
   win.loadURL(
@@ -73,27 +73,45 @@ ipcMain.on(QUERY_CHANNEL, (event: Event, message: any) => {
     message.command_list
   );
 
-  request(url, (err: Error, resp: request.Response, body: string) => {
-    if (err) {
-      console.error(err);
-      event.sender.send(QUERY_CHANNEL_RESPONSE, "");
-      return;
-    }
+  request(
+    url,
+    { timeout: 2000 },
+    (err: any, resp: request.Response, body: string) => {
+      if (err) {
+        if (err.code === "ETIMEDOUT") {
+          dialog.showErrorBox(
+            "Connection timed out!",
+            "Hets could not be reached.\nPlease check that the adress and port in config.json are correct."
+          );
+        }
 
-    if (resp.statusCode !== 200) {
-      if (resp.statusCode === 422) {
-        dialog.showErrorBox(
-          "Could not open file!",
-          `Hets returned with error code: ${resp.statusCode}.`
-        );
+        if (err.code === "ECONNREFUSED") {
+          dialog.showErrorBox(
+            "Connection refused!",
+            "Hets could not be reached.\nPlease check that the adress and port in config.json are correct."
+          );
+        }
+
+        console.error(err);
+        event.sender.send(QUERY_CHANNEL_RESPONSE, "");
+        return;
       }
-      console.error("Got status code: " + resp.statusCode);
-      event.sender.send(QUERY_CHANNEL_RESPONSE, "");
-      return;
-    }
 
-    event.sender.send(QUERY_CHANNEL_RESPONSE, JSON.parse(body));
-  });
+      if (resp.statusCode !== 200) {
+        if (resp.statusCode === 422) {
+          dialog.showErrorBox(
+            "Could not open file!",
+            `Hets returned with error code: ${resp.statusCode}.`
+          );
+        }
+        console.error("Got status code: " + resp.statusCode);
+        event.sender.send(QUERY_CHANNEL_RESPONSE, "");
+        return;
+      }
+
+      event.sender.send(QUERY_CHANNEL_RESPONSE, JSON.parse(body));
+    }
+  );
 });
 
 ipcMain.on(CONFIG_GET_CHANNEL, (event: Event, _message: any) => {
@@ -124,27 +142,45 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
         message.command_list
       );
 
-      request(url, (err: Error, resp: request.Response, body: string) => {
-        if (err) {
-          console.error(err);
-          event.sender.send(QUERY_CHANNEL_RESPONSE, "");
-          return;
-        }
+      request(
+        url,
+        { timeout: 2000 },
+        (err: any, resp: request.Response, body: string) => {
+          if (err) {
+            if (err.code === "ETIMEDOUT") {
+              dialog.showErrorBox(
+                "Connection timed out!",
+                "Hets could not be reached.\nPlease check that the adress and port in config.json are correct."
+              );
+            }
 
-        if (resp.statusCode !== 200) {
-          if (resp.statusCode === 422) {
-            dialog.showErrorBox(
-              "Could not open file!",
-              `Hets returned with error code: ${resp.statusCode}.`
-            );
+            if (err.code === "ECONNREFUSED") {
+              dialog.showErrorBox(
+                "Connection refused!",
+                "Hets could not be reached.\nPlease check that the adress and port in config.json are correct."
+              );
+            }
+
+            console.error(err);
+            event.sender.send(QUERY_CHANNEL_RESPONSE, "");
+            return;
           }
-          console.error("Got status code: " + resp.statusCode);
-          event.sender.send(QUERY_CHANNEL_RESPONSE, "");
-          return;
-        }
 
-        event.sender.send(QUERY_CHANNEL_RESPONSE, JSON.parse(body));
-      });
+          if (resp.statusCode !== 200) {
+            if (resp.statusCode === 422) {
+              dialog.showErrorBox(
+                "Could not open file!",
+                `Hets returned with error code: ${resp.statusCode}.`
+              );
+            }
+            console.error("Got status code: " + resp.statusCode);
+            event.sender.send(QUERY_CHANNEL_RESPONSE, "");
+            return;
+          }
+
+          event.sender.send(QUERY_CHANNEL_RESPONSE, JSON.parse(body));
+        }
+      );
     }
   );
 });
