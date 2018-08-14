@@ -58,13 +58,19 @@ export class InformationSidebar extends React.Component<
           return {
             title: theo.name,
             key: "theo-" + i,
-            content: theo.SenSymbols.map((sym: SenSymbol, i: number) => {
-              return (
-                <div key={i} className="text-mono">
-                  {sym.Symbol}
-                </div>
-              );
-            })
+            content: [
+              <div key={i} className="text-mono">
+                {theo.Theorem}
+              </div>
+            ].concat(
+              theo.SenSymbols.map((sym: SenSymbol, i: number) => {
+                return (
+                  <div key={i} className="text-mono">
+                    {sym.Symbol}
+                  </div>
+                );
+              })
+            )
           };
         }
       );
