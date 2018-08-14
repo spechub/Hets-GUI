@@ -40,7 +40,7 @@ export class FillScreen extends React.Component<Props, State> {
     this.setState({
       width:
         remote.getCurrentWindow().getContentSize()[0] - (16 + sidebarWidth),
-      height: remote.getCurrentWindow().getContentSize()[1] - (topbarHeight + 5)
+      height: remote.getCurrentWindow().getContentSize()[1] - (topbarHeight + 7)
     });
   }
 

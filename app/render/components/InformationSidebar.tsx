@@ -1,19 +1,12 @@
 import * as React from "react";
-import { Button } from "semantic-ui-react";
-import { Accordion } from "semantic-ui-react";
+import { Accordion, List } from "semantic-ui-react";
 
 import { Theorem, Declaration, SenSymbol, Axiom } from "../../shared/DGraph";
-import { EGraphRenderer } from "../reducers/reducer";
 import { NodeLabel, EdgeLabel } from "../actions/GraphHelper";
 
 export interface InformationSidebarProps {
   node: NodeLabel;
   edge: EdgeLabel;
-  hidden: boolean;
-  renderer: EGraphRenderer;
-  onHideInternal: () => void;
-  onShowInternal: () => void;
-  onSwitchRenderer: (renderer: EGraphRenderer) => void;
 }
 
 export class InformationSidebar extends React.Component<
@@ -132,44 +125,6 @@ export class InformationSidebar extends React.Component<
 
     return (
       <>
-        <p>
-          {this.props.hidden ? (
-            <Button
-              onClick={() => {
-                this.props.onShowInternal();
-              }}
-            >
-              Show intermediate Nodes
-            </Button>
-          ) : (
-            <Button
-              onClick={() => {
-                this.props.onHideInternal();
-              }}
-            >
-              Hide intermediate Nodes
-            </Button>
-          )}
-        </p>
-        <p>
-          {this.props.renderer === EGraphRenderer.GRAPHVIZ ? (
-            <Button
-              onClick={() => {
-                this.props.onSwitchRenderer(EGraphRenderer.FORCE_DIRCETED);
-              }}
-            >
-              switch to FD layout
-            </Button>
-          ) : (
-            <Button
-              onClick={() => {
-                this.props.onSwitchRenderer(EGraphRenderer.GRAPHVIZ);
-              }}
-            >
-              switch to hierarchical layout
-            </Button>
-          )}
-        </p>
         {this.props.node ? (
           <>
             <h5>Node</h5>
@@ -196,7 +151,10 @@ export class InformationSidebar extends React.Component<
             <Accordion panels={this.rootPanels} />
           </>
         ) : (
-          ""
+          <>
+            <h5>Node</h5>
+            <p>Please select a node.</p>
+          </>
         )}
         {this.props.edge ? (
           <>
@@ -220,11 +178,11 @@ export class InformationSidebar extends React.Component<
               this.props.edge.Type.includes("HetDefInc") ? (
                 <>
                   <span>{"Morphism:"}</span>
-                  <ul className="gmorph-list">
+                  <List>
                     {this.props.edge.GMorphism.map((v: string, i: number) => {
-                      return <li key={"gmorph-" + i}>{v}</li>;
+                      return <List.Item key={"gmorph-" + i}>{v}</List.Item>;
                     })}
-                  </ul>
+                  </List>
                   <br />
                 </>
               ) : (
@@ -249,7 +207,10 @@ export class InformationSidebar extends React.Component<
             </p>
           </>
         ) : (
-          ""
+          <>
+            <h5>Edge</h5>
+            <p>Please select an edge.</p>
+          </>
         )}
       </>
     );
