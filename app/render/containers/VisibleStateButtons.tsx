@@ -12,7 +12,8 @@ import {
 const mapStateToProps = (state: HetsGuiState) => {
   return {
     hidden: state.internalHidden,
-    renderer: state.openRenderer
+    renderer: state.openRenderer,
+    graph: state.graph.dgraph
   };
 };
 

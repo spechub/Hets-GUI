@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as dagreD3 from "dagre-d3";
 import { Button } from "semantic-ui-react";
 
 import { EGraphRenderer } from "../reducers/reducer";
@@ -6,6 +7,7 @@ import { EGraphRenderer } from "../reducers/reducer";
 export interface Props {
   hidden: boolean;
   renderer: EGraphRenderer;
+  graph: dagreD3.graphlib.Graph;
   onHideInternal: () => void;
   onShowInternal: () => void;
   onSwitchRenderer: (renderer: EGraphRenderer) => void;
@@ -24,6 +26,7 @@ export class StateButtons extends React.Component<Props, {}> {
             onClick={() => {
               this.props.onShowInternal();
             }}
+            disabled={this.props.graph === null}
           >
             Show Nodes
           </Button>
@@ -32,6 +35,7 @@ export class StateButtons extends React.Component<Props, {}> {
             onClick={() => {
               this.props.onHideInternal();
             }}
+            disabled={this.props.graph === null}
           >
             Hide Nodes
           </Button>
@@ -43,7 +47,7 @@ export class StateButtons extends React.Component<Props, {}> {
               this.props.onSwitchRenderer(EGraphRenderer.FORCE_DIRCETED);
             }}
           >
-            Force-directed layout
+            Hierarchical layout
           </Button>
         ) : (
           <Button
@@ -51,7 +55,7 @@ export class StateButtons extends React.Component<Props, {}> {
               this.props.onSwitchRenderer(EGraphRenderer.GRAPHVIZ);
             }}
           >
-            Hierarchical layout
+            Force-directed layout
           </Button>
         )}
       </Button.Group>
