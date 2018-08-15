@@ -12,6 +12,7 @@ import {
   OPEN_FILE_CANCEL
 } from "./shared/SharedConstants";
 import { URLType } from "./shared/Types";
+import { StatusCode } from "./statuscodes";
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -98,13 +99,16 @@ ipcMain.on(QUERY_CHANNEL, (event: Event, message: any) => {
       }
 
       if (resp.statusCode !== 200) {
-        if (resp.statusCode === 422) {
-          dialog.showErrorBox(
-            "Could not open file!",
-            `Hets returned with error code: ${resp.statusCode}.`
-          );
-        }
-        console.error("Got status code: " + resp.statusCode);
+        dialog.showErrorBox(
+          `${StatusCode.fromCode(resp.statusCode)}!`,
+          `Hets returned with error code: ${resp.statusCode}.`
+        );
+
+        console.error(
+          `Status code: ${StatusCode.fromCode(resp.statusCode)} (${
+            resp.statusCode
+          })`
+        );
         event.sender.send(QUERY_CHANNEL_RESPONSE, "");
         return;
       }
@@ -167,13 +171,16 @@ ipcMain.on(OPEN_FILE, (event: Event, message: any) => {
           }
 
           if (resp.statusCode !== 200) {
-            if (resp.statusCode === 422) {
-              dialog.showErrorBox(
-                "Could not open file!",
-                `Hets returned with error code: ${resp.statusCode}.`
-              );
-            }
-            console.error("Got status code: " + resp.statusCode);
+            dialog.showErrorBox(
+              `${StatusCode.fromCode(resp.statusCode)}!`,
+              `Hets returned with error code: ${resp.statusCode}.`
+            );
+
+            console.error(
+              `Status code: ${StatusCode.fromCode(resp.statusCode)} (${
+                resp.statusCode
+              })`
+            );
             event.sender.send(QUERY_CHANNEL_RESPONSE, "");
             return;
           }
