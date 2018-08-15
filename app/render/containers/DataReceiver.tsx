@@ -6,7 +6,10 @@ import { Dispatch } from "redux";
 import { IPCComm } from "../actions/IPCComm";
 import { QUERY_CHANNEL_RESPONSE } from "../../shared/SharedConstants";
 import { DGraphParser } from "../actions/DGraphParser";
-import { changeGraphAction } from "../actions/HetsGuiActions";
+import {
+  changeGraphAction,
+  showInternalAction
+} from "../actions/HetsGuiActions";
 import { constructGraph } from "../actions/GraphHelper";
 import { DGNode, DGLink } from "../../shared/DGraph";
 
@@ -16,6 +19,7 @@ type DataReceiverProps = {
     nodes: DGNode[],
     edges: DGLink[]
   ) => void;
+  resetHidden: () => void;
 };
 
 class DataReceiver extends React.Component<DataReceiverProps, {}> {
@@ -35,6 +39,7 @@ class DataReceiver extends React.Component<DataReceiverProps, {}> {
     }
 
     const graph = constructGraph(g.dgraph.DGNodes, g.dgraph.DGLinks);
+    this.props.resetHidden();
     this.props.onGraphLoaded(graph, g.dgraph.DGNodes, g.dgraph.DGLinks);
   }
 
@@ -55,6 +60,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
       edges: DGLink[]
     ) => {
       dispatch(changeGraphAction(graph, nodes, edges));
+    },
+    resetHidden: () => {
+      dispatch(showInternalAction());
     }
   };
 };
