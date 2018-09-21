@@ -47,7 +47,7 @@ const edgeStyle = (e: DGLink): string => {
       : e.Type.includes("Hiding")
         ? "stroke: #6babef; fill: none; stroke-width: 2px;"
         : e.Type.includes("HetDefInc")
-          ? "stroke: #a333c8; fill: none; stroke-width: 2px;"
+          ? "stroke: #a333c8; fill: none; stroke-dasharray: 5 2; stroke-width: 2px;"
           : "stroke: #999; fill: none; stroke-width: 2px;";
 };
 
